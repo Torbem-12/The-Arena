@@ -4,898 +4,1232 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>The Arena — Pi Task Marketplace</title>
-<link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet"/>
 <script src="https://sdk.minepi.com/pi-sdk.js"></script>
 <style>
-:root {
-  --black: #060606;
-  --surface: #0f0f0f;
-  --surface2: #161616;
-  --border: #1f1f1f;
-  --border2: #2a2a2a;
-  --gold: #e8a020;
-  --gold-dim: #a06a10;
-  --white: #f2ead8;
-  --muted: #5a5a5a;
-  --muted2: #3a3a3a;
-  --green: #2ecc71;
-  --red: #e74c3c;
+:root{
+  --black:#060606;--surface:#0f0f0f;--surface2:#161616;--surface3:#1c1c1c;
+  --border:#1f1f1f;--border2:#2a2a2a;--border3:#333;
+  --gold:#e8a020;--gold2:#f0b030;--gold-dim:#a06a10;--gold-bg:rgba(232,160,32,0.07);
+  --white:#f2ead8;--white2:#c8c0a8;--muted:#5a5a5a;--muted2:#3a3a3a;
+  --green:#2ecc71;--green-bg:rgba(46,204,113,0.07);
+  --red:#e74c3c;--red-bg:rgba(231,76,60,0.07);
+  --blue:#3498db;
 }
-* { margin:0; padding:0; box-sizing:border-box; }
-html { scroll-behavior:smooth; }
-body { background:var(--black); color:var(--white); font-family:'Space Grotesk',sans-serif; min-height:100vh; overflow-x:hidden; }
-::-webkit-scrollbar { width:3px; }
-::-webkit-scrollbar-track { background:var(--black); }
-::-webkit-scrollbar-thumb { background:var(--gold-dim); }
-.display { font-family:'Bebas Neue',sans-serif; letter-spacing:2px; }
-.mono { font-family:'JetBrains Mono',monospace; }
-.app { display:flex; flex-direction:column; min-height:100vh; }
-
-/* HEADER */
-header { position:sticky; top:0; z-index:100; background:var(--black); border-bottom:1px solid var(--border); padding:0 24px; height:56px; display:flex; align-items:center; justify-content:space-between; }
-.logo { display:flex; align-items:center; gap:10px; }
-.logo-mark { width:32px; height:32px; background:var(--gold); display:flex; align-items:center; justify-content:center; font-family:'Bebas Neue',sans-serif; font-size:18px; color:var(--black); clip-path:polygon(50% 0%,100% 25%,100% 75%,50% 100%,0% 75%,0% 25%); }
-.logo-text { font-family:'Bebas Neue',sans-serif; font-size:22px; letter-spacing:3px; color:var(--white); }
-.logo-text span { color:var(--gold); }
-.header-right { display:flex; align-items:center; gap:12px; }
-.live-dot { display:flex; align-items:center; gap:5px; font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--green); letter-spacing:1px; }
-.live-dot::before { content:''; width:6px; height:6px; border-radius:50%; background:var(--green); animation:blink 2s infinite; }
-@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.2} }
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{background:var(--black);color:var(--white);font-family:'Space Grotesk',sans-serif;min-height:100vh;overflow-x:hidden;}
+::-webkit-scrollbar{width:3px;}::-webkit-scrollbar-track{background:var(--black);}::-webkit-scrollbar-thumb{background:var(--gold-dim);}
+input,select,textarea,button{font-family:'Space Grotesk',sans-serif;}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0.2}}
+@keyframes slideDown{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes modalIn{from{opacity:0;transform:scale(0.96)translateY(10px)}to{opacity:1;transform:scale(1)translateY(0)}}
+@keyframes spin{to{transform:rotate(360deg)}}
 
 /* BUTTONS */
-.btn { border:none; cursor:pointer; font-family:'JetBrains Mono',monospace; font-size:11px; font-weight:600; letter-spacing:1.5px; padding:8px 18px; transition:all 0.15s ease; text-transform:uppercase; }
-.btn-gold { background:var(--gold); color:var(--black); }
-.btn-gold:hover { background:#f0b030; transform:translateY(-1px); }
-.btn-gold:disabled { background:var(--muted2); color:var(--muted); cursor:not-allowed; transform:none; }
-.btn-outline { background:transparent; color:var(--gold); border:1px solid var(--gold); }
-.btn-outline:hover { background:var(--gold); color:var(--black); }
+.btn{border:none;cursor:pointer;font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;letter-spacing:1.5px;padding:9px 20px;transition:all 0.15s;text-transform:uppercase;display:inline-flex;align-items:center;justify-content:center;gap:8px;}
+.btn-gold{background:var(--gold);color:var(--black);}
+.btn-gold:hover{background:var(--gold2);transform:translateY(-1px);}
+.btn-gold:disabled{background:var(--muted2);color:var(--muted);cursor:not-allowed;transform:none;}
+.btn-outline{background:transparent;color:var(--gold);border:1px solid var(--gold);}
+.btn-outline:hover{background:var(--gold);color:var(--black);}
+.btn-ghost{background:transparent;color:var(--muted);border:1px solid var(--border2);}
+.btn-ghost:hover{border-color:var(--muted);color:var(--white);}
+.btn-red{background:var(--red);color:white;}
+.btn-full{width:100%;padding:13px;}
+.btn-sm{padding:6px 14px;font-size:10px;}
+.btn-lg{padding:13px 28px;font-size:12px;}
+.loader{display:inline-block;width:13px;height:13px;border:2px solid var(--border2);border-top-color:var(--gold);border-radius:50%;animation:spin 0.7s linear infinite;}
 
-/* STATS BAR */
-.stats-bar { background:var(--surface); border-bottom:1px solid var(--border); padding:0 24px; }
-.stats-inner { max-width:1200px; margin:0 auto; display:flex; gap:0; overflow-x:auto; }
-.stat-item { padding:12px 28px 12px 0; display:flex; align-items:baseline; gap:8px; border-right:1px solid var(--border); margin-right:28px; white-space:nowrap; flex-shrink:0; }
-.stat-item:last-child { border-right:none; }
-.stat-val { font-family:'Bebas Neue',sans-serif; font-size:24px; letter-spacing:1px; }
-.stat-label { font-family:'JetBrains Mono',monospace; font-size:9px; color:var(--muted); letter-spacing:2px; text-transform:uppercase; }
-
-/* TABS */
-.tabs { background:var(--black); border-bottom:1px solid var(--border); padding:0 24px; display:flex; }
-.tab-btn { background:none; border:none; border-bottom:2px solid transparent; color:var(--muted); padding:14px 20px; font-family:'JetBrains Mono',monospace; font-size:10px; font-weight:600; letter-spacing:2px; text-transform:uppercase; cursor:pointer; transition:all 0.15s; }
-.tab-btn.active { color:var(--gold); border-bottom-color:var(--gold); }
-.tab-btn:hover:not(.active) { color:var(--white); }
-
-/* MAIN */
-main { flex:1; max-width:1200px; margin:0 auto; width:100%; padding:28px 24px; }
-.section { display:none; }
-.section.active { display:block; }
-
-/* FILTERS */
-.filter-row { display:flex; gap:6px; margin-bottom:24px; flex-wrap:wrap; align-items:center; }
-.filter-btn { background:transparent; border:1px solid var(--border2); color:var(--muted); padding:5px 14px; font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:1px; cursor:pointer; transition:all 0.12s; text-transform:uppercase; }
-.filter-btn.active { background:var(--gold); border-color:var(--gold); color:var(--black); font-weight:700; }
-.filter-btn:hover:not(.active) { border-color:var(--muted); color:var(--white); }
-.filter-count { margin-left:auto; font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--muted2); }
-
-/* TASK GRID */
-.task-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(340px,1fr)); gap:1px; background:var(--border); border:1px solid var(--border); }
-
-/* TASK CARD */
-.task-card { background:var(--surface); padding:22px; cursor:pointer; transition:background 0.15s; position:relative; border-left:3px solid transparent; }
-.task-card:hover { background:var(--surface2); }
-.task-card.hot { border-left-color:var(--gold); }
-.task-card.new-card { border-left-color:var(--green); animation:slideDown 0.35s ease; }
-@keyframes slideDown { from{opacity:0;transform:translateY(-8px)} to{opacity:1;transform:translateY(0)} }
-.card-meta { display:flex; gap:6px; align-items:center; flex-wrap:wrap; margin-bottom:8px; }
-.tag { font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:1.5px; text-transform:uppercase; padding:2px 8px; border:1px solid var(--border2); color:var(--muted); }
-.tag-hot { border-color:var(--gold-dim); color:var(--gold); }
-.tag-new { border-color:#1a4a2a; color:var(--green); background:#0a1f12; }
-.card-top { display:flex; justify-content:space-between; align-items:flex-start; gap:12px; margin-bottom:14px; }
-.card-title { font-size:15px; font-weight:600; color:var(--white); line-height:1.4; margin-bottom:4px; }
-.card-poster { font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--muted); }
-.card-poster span { color:#888; }
-.bounty-block { text-align:right; flex-shrink:0; }
-.bounty-amount { font-family:'Bebas Neue',sans-serif; font-size:28px; letter-spacing:1px; color:var(--gold); line-height:1; }
-.bounty-label { font-family:'JetBrains Mono',monospace; font-size:9px; color:var(--muted); letter-spacing:2px; margin-top:2px; }
-.progress-wrap { margin:14px 0 10px; }
-.progress-row { display:flex; justify-content:space-between; margin-bottom:5px; }
-.progress-row span { font-family:'JetBrains Mono',monospace; font-size:9px; color:var(--muted); }
-.progress-track { height:2px; background:var(--border2); position:relative; overflow:hidden; }
-.progress-fill { height:100%; transition:width 0.4s ease; position:absolute; top:0; left:0; }
-.skills { display:flex; gap:5px; flex-wrap:wrap; margin-bottom:14px; }
-.skill { font-family:'JetBrains Mono',monospace; font-size:9px; color:var(--muted); border:1px solid var(--border); padding:2px 7px; }
-.timer { font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:1px; padding:2px 8px; border:1px solid; }
-.timer.urgent { color:var(--red); border-color:rgba(231,76,60,0.3); }
-.timer.warning { color:var(--gold); border-color:rgba(232,160,32,0.3); }
-.timer.safe { color:var(--green); border-color:rgba(46,204,113,0.3); }
-.claim-btn { width:100%; padding:10px; font-family:'JetBrains Mono',monospace; font-size:11px; font-weight:700; letter-spacing:2px; text-transform:uppercase; border:none; cursor:pointer; transition:all 0.15s; }
-.claim-btn.open { background:var(--gold); color:var(--black); }
-.claim-btn.open:hover { background:#f0b030; }
-.claim-btn.claimed { background:var(--surface2); color:var(--muted); cursor:not-allowed; border:1px solid var(--border2); }
-.claim-btn.full { background:var(--surface2); color:var(--muted2); cursor:not-allowed; }
-.empty { text-align:center; padding:80px 0; grid-column:1/-1; background:var(--surface); }
-.empty-icon { font-family:'Bebas Neue',sans-serif; font-size:64px; color:var(--border2); margin-bottom:12px; }
-.empty-text { font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--muted); letter-spacing:2px; }
+/* FORMS */
+.fgroup{margin-bottom:16px;}
+.flabel{display:block;font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-bottom:6px;}
+.finput,.fselect,.ftextarea{width:100%;background:var(--black);border:1px solid var(--border2);color:var(--white);padding:10px 14px;font-size:13px;outline:none;transition:border-color 0.15s;}
+.finput:focus,.fselect:focus,.ftextarea:focus{border-color:var(--gold);}
+.ftextarea{min-height:88px;resize:vertical;}
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.ferror{background:var(--red-bg);border:1px solid rgba(231,76,60,0.3);padding:10px 14px;margin-bottom:14px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--red);display:none;}
+.fsuccess{background:var(--green-bg);border:1px solid rgba(46,204,113,0.3);padding:10px 14px;margin-bottom:14px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--green);display:none;}
 
 /* MODALS */
-.modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.92); z-index:500; align-items:center; justify-content:center; padding:16px; }
-.modal-overlay.open { display:flex; }
-.modal { background:var(--surface); border:1px solid var(--border2); width:100%; max-width:540px; max-height:90vh; overflow-y:auto; padding:32px; animation:modalIn 0.2s ease; }
-@keyframes modalIn { from{opacity:0;transform:scale(0.97) translateY(8px)} to{opacity:1;transform:scale(1) translateY(0)} }
-.modal-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:28px; }
-.modal-title { font-family:'Bebas Neue',sans-serif; font-size:24px; letter-spacing:3px; color:var(--gold); }
-.modal-close { background:none; border:none; color:var(--muted); cursor:pointer; font-size:20px; line-height:1; padding:4px; transition:color 0.1s; }
-.modal-close:hover { color:var(--white); }
-.form-group { margin-bottom:18px; }
-.form-label { display:block; font-family:'JetBrains Mono',monospace; font-size:9px; color:var(--muted); letter-spacing:2px; text-transform:uppercase; margin-bottom:7px; }
-.form-input,.form-select,.form-textarea { width:100%; background:var(--black); border:1px solid var(--border2); color:var(--white); padding:10px 14px; font-family:'Space Grotesk',sans-serif; font-size:13px; outline:none; transition:border-color 0.15s; }
-.form-input:focus,.form-select:focus,.form-textarea:focus { border-color:var(--gold); }
-.form-textarea { min-height:90px; resize:vertical; }
-.form-row { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
-.pay-summary { background:var(--black); border:1px solid var(--border2); padding:16px 18px; margin-bottom:20px; }
-.pay-summary-label { font-family:'JetBrains Mono',monospace; font-size:9px; color:var(--muted); letter-spacing:2px; margin-bottom:10px; }
-.pay-summary-row { display:flex; justify-content:space-between; align-items:center; }
-.pay-summary-amount { font-family:'Bebas Neue',sans-serif; font-size:28px; color:var(--gold); }
-.pay-note { font-family:'JetBrains Mono',monospace; font-size:9px; color:var(--muted2); margin-top:8px; line-height:1.8; }
-.error-box { background:#1a0808; border:1px solid rgba(231,76,60,0.3); padding:10px 14px; margin-bottom:16px; font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--red); display:none; }
-.detail-stats { display:grid; grid-template-columns:1fr 1fr 1fr; background:var(--black); border:1px solid var(--border2); margin-bottom:24px; }
-.detail-stat { padding:16px; text-align:center; border-right:1px solid var(--border2); }
-.detail-stat:last-child { border-right:none; }
-.detail-stat-val { font-family:'Bebas Neue',sans-serif; font-size:22px; letter-spacing:1px; }
-.detail-stat-key { font-family:'JetBrains Mono',monospace; font-size:9px; color:var(--muted); letter-spacing:2px; margin-top:4px; }
-.how-box { background:var(--black); border:1px solid var(--border); padding:14px 18px; margin-bottom:24px; }
-.how-title { font-family:'JetBrains Mono',monospace; font-size:9px; color:var(--muted); letter-spacing:2px; margin-bottom:10px; }
-.how-steps { font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--muted); line-height:2.1; }
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:500;align-items:center;justify-content:center;padding:16px;}
+.overlay.open{display:flex;}
+.modal{background:var(--surface);border:1px solid var(--border2);width:100%;max-width:520px;max-height:92vh;overflow-y:auto;padding:30px;animation:modalIn 0.2s ease;}
+.modal-hd{display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;}
+.modal-title{font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:3px;color:var(--gold);}
+.modal-x{background:none;border:none;color:var(--muted);cursor:pointer;font-size:22px;line-height:1;transition:color 0.1s;}
+.modal-x:hover{color:var(--white);}
 
-/* MY TASKS */
-.my-task-card { background:var(--surface); border:1px solid var(--border); border-left:3px solid var(--green); padding:20px 22px; margin-bottom:1px; }
-.my-task-header { display:flex; justify-content:space-between; margin-bottom:10px; }
-.status-badge { font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:2px; padding:3px 10px; text-transform:uppercase; }
-.status-badge.progress { color:var(--green); border:1px solid rgba(46,204,113,0.3); }
-.my-task-title { font-size:15px; font-weight:600; color:var(--white); margin-bottom:12px; }
-.my-task-footer { display:flex; justify-content:space-between; align-items:center; }
-.submit-btn { background:transparent; border:1px solid var(--green); color:var(--green); padding:7px 18px; font-family:'JetBrains Mono',monospace; font-size:10px; font-weight:700; letter-spacing:1.5px; cursor:pointer; transition:all 0.15s; }
-.submit-btn:hover { background:var(--green); color:var(--black); }
-.earnings-card { background:var(--surface); border:1px solid var(--border); padding:24px; margin-top:28px; display:flex; gap:48px; }
-.earn-val { font-family:'Bebas Neue',sans-serif; font-size:36px; letter-spacing:1px; color:var(--gold); }
-.earn-key { font-family:'JetBrains Mono',monospace; font-size:9px; color:var(--muted); letter-spacing:2px; margin-top:4px; }
-
-/* LEADERBOARD */
-.lb-row { display:flex; align-items:center; gap:20px; padding:16px 20px; margin-bottom:1px; background:var(--surface); border-left:3px solid var(--border2); transition:background 0.12s; }
-.lb-row:hover { background:var(--surface2); }
-.lb-row.gold-row { border-left-color:var(--gold); }
-.lb-row.silver-row { border-left-color:#888; }
-.lb-row.bronze-row { border-left-color:#8B4513; }
-.lb-row.you-row { border-left-color:var(--green); background:#0a120a; }
-.lb-rank { font-family:'Bebas Neue',sans-serif; font-size:24px; width:28px; text-align:center; color:var(--muted2); }
-.lb-row.gold-row .lb-rank { color:var(--gold); }
-.lb-info { flex:1; }
-.lb-name { font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--white); }
-.lb-row.you-row .lb-name { color:var(--green); }
-.lb-tasks { font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--muted); margin-top:3px; }
-.lb-earned { font-family:'Bebas Neue',sans-serif; font-size:22px; color:var(--gold); }
-.section-eyebrow { font-family:'JetBrains Mono',monospace; font-size:9px; color:var(--muted); letter-spacing:3px; text-transform:uppercase; margin-bottom:20px; }
+/* LOGO */
+.logo{display:flex;align-items:center;gap:10px;text-decoration:none;cursor:pointer;}
+.logo-hex{width:34px;height:34px;background:var(--gold);clip-path:polygon(50% 0%,100% 25%,100% 75%,50% 100%,0% 75%,0% 25%);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--black);flex-shrink:0;}
+.logo-name{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:3px;color:var(--white);}
+.logo-name span{color:var(--gold);}
 
 /* TOAST */
-#toast { position:fixed; bottom:28px; left:50%; transform:translateX(-50%) translateY(20px); padding:11px 24px; font-family:'JetBrains Mono',monospace; font-size:12px; font-weight:600; letter-spacing:1px; z-index:9999; white-space:nowrap; opacity:0; transition:all 0.25s ease; pointer-events:none; }
-#toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
-#toast.success { background:var(--green); color:var(--black); }
-#toast.error { background:var(--red); color:white; }
-#toast.warn { background:var(--gold); color:var(--black); }
+#toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);padding:11px 24px;font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;letter-spacing:1px;z-index:9999;white-space:nowrap;opacity:0;transition:all 0.25s ease;pointer-events:none;max-width:92vw;overflow:hidden;text-overflow:ellipsis;}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+#toast.t-s{background:var(--green);color:var(--black);}
+#toast.t-e{background:var(--red);color:white;}
+#toast.t-w{background:var(--gold);color:var(--black);}
 
-/* RESPONSIVE */
-@media(max-width:600px) {
-  .task-grid { grid-template-columns:1fr; }
-  .form-row { grid-template-columns:1fr; }
-  .detail-stats { grid-template-columns:1fr; }
-  .detail-stat { border-right:none; border-bottom:1px solid var(--border2); }
-  .earnings-card { flex-direction:column; gap:24px; }
-  header { padding:0 16px; }
-  main { padding:20px 16px; }
-  .modal { padding:24px 18px; }
-  .logo-text { font-size:18px; }
+/* ═══════════════════════════ LANDING ═══════════════════════════ */
+#pg-landing{min-height:100vh;display:none;flex-direction:column;}
+.land-nav{position:sticky;top:0;z-index:100;background:rgba(6,6,6,0.96);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:0 28px;height:58px;display:flex;align-items:center;justify-content:space-between;}
+.land-nav-links{display:flex;align-items:center;gap:20px;}
+.land-nav-links a{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted);letter-spacing:1.5px;text-decoration:none;transition:color 0.15s;}
+.land-nav-links a:hover{color:var(--white);}
+
+.hero{min-height:90vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:80px 24px 60px;position:relative;overflow:hidden;}
+.hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 70% 50% at 50% -5%,rgba(232,160,32,0.1) 0%,transparent 65%);pointer-events:none;}
+.hero-badge{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:3px;color:var(--gold);border:1px solid rgba(232,160,32,0.35);padding:6px 18px;margin-bottom:30px;display:inline-block;animation:fadeIn 0.8s ease;}
+.hero-h1{font-family:'Bebas Neue',sans-serif;font-size:clamp(64px,13vw,116px);letter-spacing:4px;color:var(--white);line-height:0.92;margin-bottom:16px;animation:fadeIn 0.8s ease 0.1s both;}
+.hero-h1 em{color:var(--gold);font-style:normal;}
+.hero-sub{font-size:16px;color:var(--muted);max-width:500px;line-height:1.75;margin-bottom:40px;animation:fadeIn 0.8s ease 0.2s both;}
+.hero-btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-bottom:52px;animation:fadeIn 0.8s ease 0.3s both;}
+.hero-stats{display:flex;gap:36px;justify-content:center;flex-wrap:wrap;animation:fadeIn 0.8s ease 0.4s both;}
+.hstat-val{font-family:'Bebas Neue',sans-serif;font-size:34px;color:var(--gold);}
+.hstat-key{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--muted);letter-spacing:2px;margin-top:2px;}
+
+.lsec{padding:72px 28px;}
+.lsec-inner{max-width:1100px;margin:0 auto;}
+.lsec-eye{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--gold);letter-spacing:3px;text-transform:uppercase;margin-bottom:10px;}
+.lsec-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(30px,5vw,50px);letter-spacing:3px;color:var(--white);margin-bottom:8px;}
+.lsec-sub{font-size:14px;color:var(--muted);max-width:460px;line-height:1.7;margin-bottom:44px;}
+
+.feat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1px;background:var(--border);}
+.feat-card{background:var(--surface);padding:26px 22px;transition:background 0.15s;}
+.feat-card:hover{background:var(--surface2);}
+.feat-ico{width:42px;height:42px;border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;font-size:18px;margin-bottom:14px;}
+.feat-name{font-family:'Bebas Neue',sans-serif;font-size:19px;letter-spacing:2px;color:var(--white);margin-bottom:7px;}
+.feat-desc{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted);line-height:1.8;}
+
+.steps-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:1px;background:var(--border);}
+.step-card{background:var(--surface);padding:26px 20px;}
+.step-num{font-family:'Bebas Neue',sans-serif;font-size:48px;color:var(--border2);line-height:1;margin-bottom:10px;}
+.step-title{font-family:'Bebas Neue',sans-serif;font-size:17px;letter-spacing:2px;color:var(--white);margin-bottom:7px;}
+.step-desc{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted);line-height:1.8;}
+
+.land-cta{background:var(--surface);border-top:1px solid var(--border);padding:72px 28px;text-align:center;}
+.lcta-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(30px,6vw,60px);letter-spacing:3px;color:var(--white);margin-bottom:10px;}
+.lcta-sub{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted);letter-spacing:1px;margin-bottom:28px;}
+.url-pill{display:inline-block;background:var(--black);border:1px solid var(--border2);padding:12px 28px;margin-bottom:24px;}
+.url-text{font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--gold);letter-spacing:2px;}
+.land-footer{padding:16px 28px;border-top:1px solid var(--border);text-align:center;}
+.land-footer span{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--muted2);letter-spacing:2px;}
+
+/* ═══════════════════════════ AUTH ═══════════════════════════ */
+#pg-auth{min-height:100vh;display:none;align-items:center;justify-content:center;flex-direction:column;padding:24px;background:var(--black);}
+.auth-card{background:var(--surface);border:1px solid var(--border2);width:100%;max-width:420px;padding:36px;animation:modalIn 0.25s ease;}
+.auth-logo{display:flex;align-items:center;gap:10px;justify-content:center;margin-bottom:28px;}
+.auth-tabs{display:flex;border-bottom:1px solid var(--border);margin-bottom:26px;}
+.auth-tab{flex:1;background:none;border:none;border-bottom:2px solid transparent;color:var(--muted);padding:11px;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:2px;cursor:pointer;transition:all 0.15s;text-transform:uppercase;}
+.auth-tab.active{color:var(--gold);border-bottom-color:var(--gold);}
+.auth-note{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted);text-align:center;margin-top:16px;line-height:1.8;}
+.auth-note .link{color:var(--gold);cursor:pointer;}
+
+/* ═══════════════════════════ APP ═══════════════════════════ */
+#pg-app{display:none;flex-direction:column;min-height:100vh;}
+
+/* HEADER */
+.app-hdr{position:sticky;top:0;z-index:100;background:rgba(6,6,6,0.97);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:0 22px;height:56px;display:flex;align-items:center;justify-content:space-between;}
+.hdr-left{display:flex;align-items:center;gap:14px;}
+.live-pill{display:flex;align-items:center;gap:5px;font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--green);letter-spacing:1px;border:1px solid rgba(46,204,113,0.2);padding:3px 10px;}
+.live-pill::before{content:'';width:5px;height:5px;border-radius:50%;background:var(--green);animation:blink 2s infinite;}
+.hdr-right{display:flex;align-items:center;gap:8px;}
+.user-chip{display:flex;align-items:center;gap:8px;border:1px solid var(--border2);padding:5px 12px;cursor:pointer;transition:border-color 0.15s;}
+.user-chip:hover{border-color:var(--border3);}
+.user-av{width:24px;height:24px;background:var(--gold);clip-path:polygon(50% 0%,100% 25%,100% 75%,50% 100%,0% 75%,0% 25%);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:13px;color:var(--black);}
+.user-nm{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--white2);}
+
+/* DASHBOARD */
+.dashboard{background:var(--surface);border-bottom:1px solid var(--border);padding:18px 22px;}
+.dash-inner{max-width:1200px;margin:0 auto;}
+.dash-greeting{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:2px;color:var(--white);margin-bottom:14px;}
+.dash-greeting em{color:var(--gold);font-style:normal;}
+.dash-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--border);border:1px solid var(--border);margin-bottom:14px;}
+.dstat{background:var(--black);padding:12px 16px;}
+.dstat-val{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:1px;}
+.dstat-key{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--muted);letter-spacing:2px;margin-top:2px;}
+.dash-actions{display:flex;gap:7px;flex-wrap:wrap;}
+
+/* SEARCH */
+.search-bar{padding:12px 22px;background:var(--black);border-bottom:1px solid var(--border);}
+.search-inner{max-width:1200px;margin:0 auto;display:flex;gap:8px;}
+.search-box{flex:1;display:flex;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--border2);padding:9px 14px;transition:border-color 0.15s;}
+.search-box:focus-within{border-color:var(--gold);}
+.search-box input{flex:1;background:none;border:none;color:var(--white);font-size:13px;outline:none;}
+.search-box input::placeholder{color:var(--muted);}
+
+/* TABS */
+.app-tabs{background:var(--black);border-bottom:1px solid var(--border);padding:0 22px;display:flex;overflow-x:auto;}
+.app-tab{background:none;border:none;border-bottom:2px solid transparent;color:var(--muted);padding:13px 18px;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;transition:all 0.15s;white-space:nowrap;flex-shrink:0;}
+.app-tab.active{color:var(--gold);border-bottom-color:var(--gold);}
+.app-tab:hover:not(.active){color:var(--white);}
+
+/* MAIN */
+.app-main{flex:1;max-width:1200px;margin:0 auto;width:100%;padding:22px;}
+.tsec{display:none;}.tsec.active{display:block;}
+
+/* FILTER BAR */
+.fbar{display:flex;gap:6px;margin-bottom:18px;flex-wrap:wrap;align-items:center;}
+.fchip{background:transparent;border:1px solid var(--border2);color:var(--muted);padding:5px 13px;font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:1px;cursor:pointer;transition:all 0.12s;text-transform:uppercase;}
+.fchip.active{background:var(--gold);border-color:var(--gold);color:var(--black);font-weight:700;}
+.fchip:hover:not(.active){border-color:var(--muted);color:var(--white);}
+.rcount{margin-left:auto;font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted2);}
+
+/* TASK GRID */
+.tgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:1px;background:var(--border);border:1px solid var(--border);}
+
+/* TASK CARD */
+.tcard{background:var(--surface);padding:20px;cursor:pointer;transition:background 0.15s;position:relative;border-left:3px solid transparent;}
+.tcard:hover{background:var(--surface2);}
+.tcard.hot{border-left-color:var(--gold);}
+.tcard.fresh{border-left-color:var(--green);animation:slideDown 0.3s ease;}
+.ctags{display:flex;gap:5px;align-items:center;flex-wrap:wrap;margin-bottom:9px;}
+.ctag{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:1.5px;text-transform:uppercase;padding:2px 7px;border:1px solid var(--border2);color:var(--muted);}
+.ctag-hot{border-color:var(--gold-dim);color:var(--gold);}
+.ctag-new{border-color:rgba(46,204,113,0.4);color:var(--green);background:var(--green-bg);}
+.tbadge{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:1px;padding:2px 8px;border:1px solid;}
+.tb-safe{color:var(--green);border-color:rgba(46,204,113,0.3);}
+.tb-warn{color:var(--gold);border-color:rgba(232,160,32,0.3);}
+.tb-urg{color:var(--red);border-color:rgba(231,76,60,0.3);}
+.ctitle{font-size:14px;font-weight:600;color:var(--white);line-height:1.4;margin-bottom:4px;}
+.cposter{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted);}
+.cposter b{color:#888;}
+.cbounty{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:1px;color:var(--gold);line-height:1;}
+.cbounty-key{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--muted);letter-spacing:2px;margin-top:1px;text-align:right;}
+.ptrack{height:2px;background:var(--border2);position:relative;overflow:hidden;margin:10px 0;}
+.pfill{height:100%;position:absolute;top:0;left:0;transition:width 0.4s ease;}
+.prow{display:flex;justify-content:space-between;margin-bottom:5px;}
+.prow span{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--muted);}
+.stags{display:flex;gap:4px;flex-wrap:wrap;margin:8px 0 12px;}
+.stag{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--muted);border:1px solid var(--border);padding:2px 7px;}
+.cbtn{width:100%;padding:9px;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;border:none;cursor:pointer;transition:all 0.15s;}
+.cb-open{background:var(--gold);color:var(--black);}
+.cb-open:hover{background:var(--gold2);}
+.cb-done{background:var(--surface3);color:var(--muted);cursor:not-allowed;border:1px solid var(--border2);}
+.cb-full{background:var(--surface3);color:var(--muted2);cursor:not-allowed;}
+
+/* EMPTY */
+.empty{text-align:center;padding:72px 0;grid-column:1/-1;background:var(--surface);}
+.empty-ico{font-family:'Bebas Neue',sans-serif;font-size:64px;color:var(--border2);margin-bottom:10px;}
+.empty-msg{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);letter-spacing:2px;}
+
+/* DETAIL MODAL */
+.dstat-grid{display:grid;grid-template-columns:1fr 1fr 1fr;background:var(--black);border:1px solid var(--border2);margin-bottom:22px;}
+.dstat-cell{padding:14px;text-align:center;border-right:1px solid var(--border2);}
+.dstat-cell:last-child{border-right:none;}
+.dstat-val{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:1px;}
+.dstat-key{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--muted);letter-spacing:2px;margin-top:3px;}
+.ddesc{font-size:13px;color:#888;line-height:1.9;margin-bottom:22px;}
+.how-box{background:var(--black);border:1px solid var(--border);padding:13px 16px;margin-bottom:22px;}
+.how-ttl{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--muted);letter-spacing:2px;margin-bottom:9px;}
+.how-steps{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);line-height:2.1;}
+
+/* PAY BOX */
+.pay-box{background:var(--black);border:1px solid var(--border2);padding:14px 16px;margin-bottom:18px;}
+.pay-box-lbl{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--muted);letter-spacing:2px;margin-bottom:9px;}
+.pay-box-row{display:flex;justify-content:space-between;align-items:center;}
+.pay-box-amt{font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--gold);}
+.pay-note{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--muted2);margin-top:7px;line-height:1.8;}
+
+/* MY TASKS */
+.mtask{background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--green);padding:18px 20px;margin-bottom:1px;}
+.mtask-top{display:flex;justify-content:space-between;margin-bottom:8px;}
+.schip{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:2px;padding:3px 10px;text-transform:uppercase;border:1px solid rgba(46,204,113,0.3);color:var(--green);}
+.mtask-title{font-size:14px;font-weight:600;color:var(--white);margin-bottom:11px;}
+.mtask-foot{display:flex;justify-content:space-between;align-items:center;}
+.submit-btn{background:transparent;border:1px solid var(--green);color:var(--green);padding:6px 16px;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;letter-spacing:1.5px;cursor:pointer;transition:all 0.15s;}
+.submit-btn:hover{background:var(--green);color:var(--black);}
+.earn-sum{background:var(--surface);border:1px solid var(--border);padding:20px;margin-top:20px;display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
+.eblock-val{font-family:'Bebas Neue',sans-serif;font-size:30px;color:var(--gold);}
+.eblock-key{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--muted);letter-spacing:2px;margin-top:3px;}
+
+/* LEADERBOARD */
+.lbrow{display:flex;align-items:center;gap:18px;padding:14px 18px;margin-bottom:1px;background:var(--surface);border-left:3px solid var(--border2);transition:background 0.12s;}
+.lbrow:hover{background:var(--surface2);}
+.lb-gld{border-left-color:var(--gold);}
+.lb-slv{border-left-color:#aaa;}
+.lb-brz{border-left-color:#cd7f32;}
+.lb-you{border-left-color:var(--green);background:#0a120a;}
+.lb-rank{font-family:'Bebas Neue',sans-serif;font-size:24px;color:var(--muted2);width:28px;text-align:center;flex-shrink:0;}
+.lb-gld .lb-rank{color:var(--gold);}
+.lb-info{flex:1;}
+.lb-name{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--white);}
+.lb-you .lb-name{color:var(--green);}
+.lb-meta{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted);margin-top:3px;}
+.lb-earn{font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--gold);text-align:right;}
+.lb-trust{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--muted);margin-top:2px;text-align:right;}
+
+/* PROFILE */
+.prof-layout{display:grid;grid-template-columns:300px 1fr;gap:18px;}
+.prof-card{background:var(--surface);border:1px solid var(--border);padding:26px;}
+.prof-av{width:76px;height:76px;background:var(--gold);clip-path:polygon(50% 0%,100% 25%,100% 75%,50% 100%,0% 75%,0% 25%);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:34px;color:var(--black);margin:0 auto 18px;}
+.prof-name{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:2px;color:var(--white);text-align:center;margin-bottom:4px;}
+.prof-handle{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted);text-align:center;margin-bottom:18px;}
+.prof-stats{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--border);}
+.pstat{background:var(--black);padding:12px;text-align:center;}
+.pstat-val{font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--gold);}
+.pstat-key{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--muted);letter-spacing:1px;margin-top:3px;}
+.trust-wrap{margin-top:18px;}
+.trust-lbl{display:flex;justify-content:space-between;font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--muted);letter-spacing:1px;margin-bottom:5px;}
+.trust-track{height:3px;background:var(--border2);}
+.trust-fill{height:100%;background:var(--gold);transition:width 0.6s ease;}
+.prof-actions{margin-top:18px;display:flex;flex-direction:column;gap:7px;}
+.prof-activity{background:var(--surface);border:1px solid var(--border);padding:22px;}
+.act-title{font-family:'Bebas Neue',sans-serif;font-size:19px;letter-spacing:2px;color:var(--white);margin-bottom:14px;}
+.act-item{padding:12px 0;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;}
+.act-item:last-child{border-bottom:none;}
+.act-text{font-size:13px;color:var(--white2);margin-bottom:3px;}
+.act-time{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted);}
+.act-earn{font-family:'Bebas Neue',sans-serif;font-size:19px;color:var(--gold);}
+
+/* SECTION LABEL */
+.sec-eye{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--muted);letter-spacing:3px;text-transform:uppercase;margin-bottom:18px;}
+
+/* APP FOOTER */
+.app-foot{border-top:1px solid var(--border);padding:12px 22px;text-align:center;}
+.app-foot span{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--muted2);letter-spacing:2px;}
+
+@media(max-width:768px){
+  .dash-stats{grid-template-columns:1fr 1fr;}
+  .prof-layout{grid-template-columns:1fr;}
+  .earn-sum{grid-template-columns:1fr 1fr;}
+  .frow{grid-template-columns:1fr;}
 }
-
-/* ── LANDING PAGE (shown outside Pi Browser) ── */
-#landing {
-  display:none;
-  min-height:100vh;
-  flex-direction:column;
-}
-
-.land-nav {
-  border-bottom:1px solid var(--border);
-  padding:0 32px;
-  height:56px;
-  display:flex; align-items:center; justify-content:space-between;
-  background:var(--black);
-}
-
-.land-hero {
-  flex:1;
-  display:flex; flex-direction:column;
-  align-items:center; justify-content:center;
-  text-align:center;
-  padding:60px 24px;
-  background:var(--black);
-  position:relative;
-  overflow:hidden;
-}
-
-.land-hero::before {
-  content:'';
-  position:absolute;
-  top:0; left:0; right:0; bottom:0;
-  background: radial-gradient(ellipse 60% 40% at 50% 0%, rgba(232,160,32,0.07) 0%, transparent 70%);
-  pointer-events:none;
-}
-
-.land-badge {
-  font-family:'JetBrains Mono',monospace;
-  font-size:10px; letter-spacing:3px;
-  color:var(--gold);
-  border:1px solid rgba(232,160,32,0.3);
-  padding:5px 16px;
-  margin-bottom:28px;
-  display:inline-block;
-}
-
-.land-h1 {
-  font-family:'Bebas Neue',sans-serif;
-  font-size:clamp(52px,10vw,96px);
-  letter-spacing:4px;
-  color:var(--white);
-  line-height:0.95;
-  margin-bottom:12px;
-}
-
-.land-h1 span { color:var(--gold); }
-
-.land-sub {
-  font-family:'Space Grotesk',sans-serif;
-  font-size:16px; color:#666;
-  max-width:480px; line-height:1.7;
-  margin-bottom:40px;
-}
-
-.land-btns { display:flex; gap:12px; justify-content:center; flex-wrap:wrap; margin-bottom:56px; }
-
-.land-pi-note {
-  font-family:'JetBrains Mono',monospace;
-  font-size:11px; color:var(--muted2);
-  letter-spacing:1px;
-}
-
-.land-pi-note span { color:var(--gold); }
-
-/* FEATURES GRID */
-.land-features {
-  background:var(--surface);
-  border-top:1px solid var(--border);
-  padding:60px 32px;
-}
-
-.land-features-inner {
-  max-width:1100px; margin:0 auto;
-}
-
-.land-feat-title {
-  font-family:'Bebas Neue',sans-serif;
-  font-size:36px; letter-spacing:3px;
-  color:var(--white);
-  margin-bottom:6px;
-}
-
-.land-feat-sub {
-  font-family:'JetBrains Mono',monospace;
-  font-size:10px; color:var(--muted);
-  letter-spacing:2px; margin-bottom:40px;
-}
-
-.feat-grid {
-  display:grid;
-  grid-template-columns:repeat(auto-fill,minmax(280px,1fr));
-  gap:1px;
-  background:var(--border);
-  border:1px solid var(--border);
-  margin-bottom:60px;
-}
-
-.feat-card {
-  background:var(--black);
-  padding:28px 24px;
-}
-
-.feat-icon {
-  font-size:24px; margin-bottom:14px;
-  display:block;
-}
-
-.feat-name {
-  font-family:'Bebas Neue',sans-serif;
-  font-size:20px; letter-spacing:2px;
-  color:var(--white); margin-bottom:8px;
-}
-
-.feat-desc {
-  font-family:'JetBrains Mono',monospace;
-  font-size:10px; color:var(--muted);
-  line-height:1.8; letter-spacing:0.3px;
-}
-
-/* HOW IT WORKS */
-.land-how {
-  max-width:700px;
-}
-
-.land-how-title {
-  font-family:'Bebas Neue',sans-serif;
-  font-size:32px; letter-spacing:3px;
-  color:var(--white); margin-bottom:24px;
-}
-
-.step-row {
-  display:flex; gap:16px; align-items:flex-start;
-  margin-bottom:16px;
-  padding:16px;
-  background:var(--surface2);
-  border-left:3px solid var(--border2);
-}
-
-.step-num {
-  font-family:'Bebas Neue',sans-serif;
-  font-size:28px; color:var(--gold);
-  line-height:1; flex-shrink:0; width:28px;
-}
-
-.step-text {
-  font-family:'JetBrains Mono',monospace;
-  font-size:12px; color:var(--white);
-  line-height:1.7; padding-top:4px;
-}
-
-.step-text span { color:var(--muted); font-size:10px; display:block; margin-top:3px; }
-
-/* CTA BOTTOM */
-.land-cta {
-  background:var(--black);
-  border-top:1px solid var(--border);
-  padding:60px 32px;
-  text-align:center;
-}
-
-.land-cta-title {
-  font-family:'Bebas Neue',sans-serif;
-  font-size:clamp(28px,5vw,52px);
-  letter-spacing:3px; color:var(--white);
-  margin-bottom:12px;
-}
-
-.land-cta-sub {
-  font-family:'JetBrains Mono',monospace;
-  font-size:11px; color:var(--muted);
-  letter-spacing:1px; margin-bottom:28px;
-}
-
-.land-footer {
-  border-top:1px solid var(--border);
-  padding:16px 32px;
-  text-align:center;
-}
-
-.land-footer span {
-  font-family:'JetBrains Mono',monospace;
-  font-size:9px; color:var(--muted2);
-  letter-spacing:2px;
-}
-
-@media(max-width:600px) {
-  .land-nav { padding:0 16px; }
-  .land-features { padding:40px 16px; }
-  .land-cta { padding:40px 16px; }
-  .feat-grid { grid-template-columns:1fr; }
+@media(max-width:600px){
+  .tgrid{grid-template-columns:1fr;}
+  .dstat-grid{grid-template-columns:1fr;}
+  .dstat-cell{border-right:none;border-bottom:1px solid var(--border2);}
+  .app-hdr,.search-bar,.dashboard,.app-tabs{padding-left:14px;padding-right:14px;}
+  .app-main{padding:14px;}
+  .modal{padding:22px 14px;}
+  .land-nav{padding:0 14px;}
+  .lsec,.land-cta{padding:48px 14px;}
+  .hero-stats{gap:20px;}
+  .steps-grid{grid-template-columns:1fr 1fr;}
 }
 </style>
 </head>
 <body>
 
-<!-- ═══════════════════════════════════════════════════════
-     LANDING PAGE — shown in regular browsers
-═══════════════════════════════════════════════════════ -->
-<div id="landing">
-
-  <!-- NAV -->
+<!-- ════════════════════ LANDING PAGE ════════════════════ -->
+<div id="pg-landing">
   <nav class="land-nav">
-    <div class="logo">
-      <div class="logo-mark">A</div>
-      <div class="logo-text">THE <span>ARENA</span></div>
+    <div class="logo" onclick="showPage('pg-landing')">
+      <div class="logo-hex">A</div>
+      <div class="logo-name">THE <span>ARENA</span></div>
     </div>
-    <span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted);letter-spacing:2px">
-      PI NETWORK APP
-    </span>
+    <div class="land-nav-links">
+      <a href="#features">Features</a>
+      <a href="#how">How It Works</a>
+      <button class="btn btn-ghost btn-sm" onclick="showAuth('signin')">Sign In</button>
+      <button class="btn btn-gold btn-sm" onclick="showAuth('signup')">Get Started</button>
+    </div>
   </nav>
 
-  <!-- HERO -->
-  <section class="land-hero">
-    <div class="land-badge">BUILT FOR PI NETWORK · VIBE CODERS CHALLENGE</div>
-    <div class="land-h1">THE<br><span>ARENA</span></div>
-    <div class="land-sub">
-      A real-time micro-task marketplace powered by Pi Network.
-      Post tasks, earn Pi, build trust — all inside Pi Browser.
+  <section class="hero">
+    <div class="hero-badge">BUILT FOR PI NETWORK · VIBE CODERS CHALLENGE 2026</div>
+    <h1 class="hero-h1">THE<br><em>ARENA</em></h1>
+    <p class="hero-sub">The first real-time micro-task marketplace on Pi Network. Post tasks, earn Pi, build reputation — secured by escrow payments.</p>
+    <div class="hero-btns">
+      <button class="btn btn-gold btn-lg" onclick="showAuth('signup')">Enter The Arena →</button>
+      <button class="btn btn-ghost btn-lg" onclick="document.getElementById('features').scrollIntoView({behavior:'smooth'})">See Features</button>
     </div>
-    <div class="land-btns">
-      <button class="btn btn-gold" style="font-size:13px;padding:12px 28px" onclick="scrollToHow()">
-        How It Works
-      </button>
-      <button class="btn" style="background:transparent;border:1px solid var(--border2);color:var(--muted);font-size:13px;padding:12px 28px" onclick="scrollToFeatures()">
-        View Features
-      </button>
-    </div>
-    <div class="land-pi-note">
-      Open inside <span>Pi Browser</span> for full functionality · Pi SDK v2.0
+    <div class="hero-stats">
+      <div><div class="hstat-val">60M+</div><div class="hstat-key">PIONEERS</div></div>
+      <div><div class="hstat-val" id="ls-tasks">7</div><div class="hstat-key">LIVE TASKS</div></div>
+      <div><div class="hstat-val" id="ls-pi">37.5</div><div class="hstat-key">π IN BOUNTIES</div></div>
+      <div><div class="hstat-val">100%</div><div class="hstat-key">Pi PAYMENTS</div></div>
     </div>
   </section>
 
-  <!-- FEATURES -->
-  <section class="land-features" id="features-section">
-    <div class="land-features-inner">
-      <div class="land-feat-title">Core Features</div>
-      <div class="land-feat-sub">WHAT MAKES THE ARENA DIFFERENT</div>
-
+  <section class="lsec" id="features" style="background:var(--surface);border-top:1px solid var(--border)">
+    <div class="lsec-inner">
+      <div class="lsec-eye">Why The Arena</div>
+      <div class="lsec-title">Built Different</div>
+      <div class="lsec-sub">Every feature designed around Pi's ecosystem — real payments, verified identity, real utility.</div>
       <div class="feat-grid">
-        <div class="feat-card">
-          <span class="feat-icon">⬡</span>
-          <div class="feat-name">Pi Authentication</div>
-          <div class="feat-desc">Secure login via Pi Browser SDK. Every user is a verified Pioneer — no fake accounts, no bots.</div>
-        </div>
-        <div class="feat-card">
-          <span class="feat-icon">◈</span>
-          <div class="feat-name">Escrow Payments</div>
-          <div class="feat-desc">Task bounties are locked in escrow via Pi Network the moment a task is posted. Released only on approval.</div>
-        </div>
-        <div class="feat-card">
-          <span class="feat-icon">▦</span>
-          <div class="feat-name">Live Task Board</div>
-          <div class="feat-desc">Real-time task feed with countdown timers, claim slots, category filters, and live bounty tracking.</div>
-        </div>
-        <div class="feat-card">
-          <span class="feat-icon">◉</span>
-          <div class="feat-name">Reputation System</div>
-          <div class="feat-desc">Pioneers build trust scores through completed tasks. Leaderboard tracks top earners in real time.</div>
-        </div>
-        <div class="feat-card">
-          <span class="feat-icon">⊞</span>
-          <div class="feat-name">Task Categories</div>
-          <div class="feat-desc">Translation, Design, Testing, Data, Survey, Writing, Dev. Every skill has a market inside The Arena.</div>
-        </div>
-        <div class="feat-card">
-          <span class="feat-icon">⟁</span>
-          <div class="feat-name">60M+ Pioneers</div>
-          <div class="feat-desc">Instant access to Pi Network's massive user base. Post a task and reach the entire ecosystem immediately.</div>
-        </div>
-      </div>
-
-      <!-- HOW IT WORKS -->
-      <div class="land-how" id="how-section">
-        <div class="land-how-title">How It Works</div>
-        <div class="step-row">
-          <div class="step-num">1</div>
-          <div class="step-text">
-            Connect your Pi Wallet
-            <span>Open The Arena in Pi Browser and authenticate with your Pi identity.</span>
-          </div>
-        </div>
-        <div class="step-row">
-          <div class="step-num">2</div>
-          <div class="step-text">
-            Post a task with a Pi bounty
-            <span>Set the title, description, reward amount, and deadline. Pi is escrowed instantly.</span>
-          </div>
-        </div>
-        <div class="step-row">
-          <div class="step-num">3</div>
-          <div class="step-text">
-            Another Pioneer claims and completes it
-            <span>Workers browse the live board, claim tasks, and submit their work.</span>
-          </div>
-        </div>
-        <div class="step-row">
-          <div class="step-num">4</div>
-          <div class="step-text">
-            You approve — Pi releases automatically
-            <span>Once you verify the work, Pi Network releases the bounty to the worker's wallet.</span>
-          </div>
-        </div>
-        <div class="step-row">
-          <div class="step-num">5</div>
-          <div class="step-text">
-            Reputation builds with every task
-            <span>Both posters and workers earn trust scores that unlock better opportunities.</span>
-          </div>
-        </div>
+        <div class="feat-card"><div class="feat-ico">⬡</div><div class="feat-name">Pi Authentication</div><div class="feat-desc">Login with Pi identity. Every user is KYC-verified. No bots, no fake accounts.</div></div>
+        <div class="feat-card"><div class="feat-ico">◈</div><div class="feat-name">Escrow Payments</div><div class="feat-desc">Bounties lock via Pi Network at post. Funds release only after work approval.</div></div>
+        <div class="feat-card"><div class="feat-ico">▦</div><div class="feat-name">Live Task Board</div><div class="feat-desc">Real-time feed with countdown timers, claim slots, and live bounty tracking.</div></div>
+        <div class="feat-card"><div class="feat-ico">◉</div><div class="feat-name">Reputation System</div><div class="feat-desc">Trust scores built from completed tasks. The leaderboard rewards consistency.</div></div>
+        <div class="feat-card"><div class="feat-ico">⊞</div><div class="feat-name">7 Categories</div><div class="feat-desc">Translation, Design, Testing, Data, Survey, Writing, Dev. Every skill has a market.</div></div>
+        <div class="feat-card"><div class="feat-ico">⟁</div><div class="feat-name">MongoDB Database</div><div class="feat-desc">Real persistent database. All tasks, users, and claims stored and synced globally.</div></div>
       </div>
     </div>
   </section>
 
-  <!-- CTA -->
+  <section class="lsec" id="how">
+    <div class="lsec-inner">
+      <div class="lsec-eye">The Process</div>
+      <div class="lsec-title">How It Works</div>
+      <div class="lsec-sub">Six steps from task creation to Pi in your wallet.</div>
+      <div class="steps-grid">
+        <div class="step-card"><div class="step-num">01</div><div class="step-title">Create Account</div><div class="step-desc">Sign up with email or connect Pi Wallet inside Pi Browser.</div></div>
+        <div class="step-card"><div class="step-num">02</div><div class="step-title">Post Task</div><div class="step-desc">Define work, set bounty, choose deadline. Pi escrowed instantly.</div></div>
+        <div class="step-card"><div class="step-num">03</div><div class="step-title">Claim Task</div><div class="step-desc">Browse the live board and claim tasks that match your skills.</div></div>
+        <div class="step-card"><div class="step-num">04</div><div class="step-title">Do the Work</div><div class="step-desc">Complete within deadline. Quality builds your reputation score.</div></div>
+        <div class="step-card"><div class="step-num">05</div><div class="step-title">Submit Proof</div><div class="step-desc">Submit your work with a link or description for review.</div></div>
+        <div class="step-card"><div class="step-num">06</div><div class="step-title">Earn Pi</div><div class="step-desc">Poster approves — Pi Network releases bounty to your wallet.</div></div>
+      </div>
+    </div>
+  </section>
+
   <section class="land-cta">
-    <div class="land-cta-title">Ready to Enter The Arena?</div>
-    <div class="land-cta-sub">OPEN PI BROWSER · NAVIGATE TO THIS URL · START EARNING</div>
-    <div style="background:var(--surface);border:1px solid var(--border2);display:inline-block;padding:14px 32px;margin-bottom:24px">
-      <span style="font-family:'JetBrains Mono',monospace;font-size:14px;color:var(--gold);letter-spacing:2px">
-        torbem-12.github.io/De-Arena-
-      </span>
+    <div class="lcta-title">Ready to Enter?</div>
+    <div class="lcta-sub">OPEN IN Pi BROWSER FOR FULL PAYMENT FUNCTIONALITY</div>
+    <div class="url-pill"><span class="url-text" id="site-url-display">torbem-12.github.io/Pi-Vicoder</span></div>
+    <div style="display:flex;gap:12px;justify-content:center;margin-top:20px;flex-wrap:wrap">
+      <button class="btn btn-gold btn-lg" onclick="showAuth('signup')">Create Account →</button>
+      <button class="btn btn-ghost btn-lg" onclick="showAuth('signin')">Sign In</button>
     </div>
-    <div class="land-cta-sub">PASTE THE URL ABOVE INTO PI BROWSER TO ACCESS THE FULL APP</div>
   </section>
-
-  <!-- FOOTER -->
-  <div class="land-footer">
-    <span>THE ARENA · BUILT FOR PI NETWORK · Pi SDK v2.0 · 60M+ PIONEERS</span>
-  </div>
-
+  <footer class="land-footer"><span>THE ARENA · Pi NETWORK · MongoDB + Express Backend · Pi SDK v2.0 · © 2026</span></footer>
 </div>
 
-<!-- ═══════════════════════════════════════════════════════
-     MAIN APP — shown inside Pi Browser
-═══════════════════════════════════════════════════════ -->
-<div class="app" id="main-app" style="display:none">
-
-  <header>
-    <div class="logo">
-      <div class="logo-mark">A</div>
-      <div class="logo-text">THE <span>ARENA</span></div>
+<!-- ════════════════════ AUTH PAGE ════════════════════ -->
+<div id="pg-auth">
+  <div class="auth-card">
+    <div class="auth-logo"><div class="logo-hex">A</div><div class="logo-name">THE <span>ARENA</span></div></div>
+    <div class="auth-tabs">
+      <button class="auth-tab active" id="at-si" onclick="switchAuthTab('signin')">Sign In</button>
+      <button class="auth-tab" id="at-su" onclick="switchAuthTab('signup')">Sign Up</button>
     </div>
-    <div class="header-right">
-      <div class="live-dot">LIVE</div>
-      <div id="user-display" style="display:none">
-        <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#888;border:1px solid var(--border2);padding:5px 12px;" id="username-display"></span>
+
+    <div id="pn-signin">
+      <div class="fgroup"><label class="flabel">Email</label><input class="finput" id="si-email" type="email" placeholder="your@email.com"/></div>
+      <div class="fgroup"><label class="flabel">Password</label><input class="finput" id="si-pass" type="password" placeholder="••••••••" onkeydown="if(event.key==='Enter')doSignIn()"/></div>
+      <div class="ferror" id="si-err"></div>
+      <button class="btn btn-gold btn-full" id="si-btn" onclick="doSignIn()">Sign In →</button>
+      <p class="auth-note">In Pi Browser? <span class="link" onclick="doPiAuth()">Connect Pi Wallet</span></p>
+    </div>
+
+    <div id="pn-signup" style="display:none">
+      <div class="fgroup"><label class="flabel">Display Name</label><input class="finput" id="su-name" placeholder="Your Name"/></div>
+      <div class="fgroup"><label class="flabel">Email</label><input class="finput" id="su-email" type="email" placeholder="your@email.com"/></div>
+      <div class="fgroup"><label class="flabel">Password</label><input class="finput" id="su-pass" type="password" placeholder="Min 6 characters" onkeydown="if(event.key==='Enter')doSignUp()"/></div>
+      <div class="ferror" id="su-err"></div>
+      <div class="fsuccess" id="su-ok"></div>
+      <button class="btn btn-gold btn-full" id="su-btn" onclick="doSignUp()">Create Account →</button>
+      <p class="auth-note">In Pi Browser? <span class="link" onclick="doPiAuth()">Connect Pi Wallet</span></p>
+    </div>
+
+    <p style="margin-top:16px;text-align:center">
+      <button class="btn btn-ghost btn-sm" onclick="showPage('pg-landing')">← Back to Home</button>
+    </p>
+  </div>
+</div>
+
+<!-- ════════════════════ MAIN APP ════════════════════ -->
+<div id="pg-app">
+  <header class="app-hdr">
+    <div class="hdr-left">
+      <div class="logo" onclick="showPage('pg-landing')"><div class="logo-hex">A</div><div class="logo-name">THE <span>ARENA</span></div></div>
+      <div class="live-pill">LIVE</div>
+    </div>
+    <div class="hdr-right">
+      <div class="user-chip" onclick="switchAppTab('profile',document.querySelectorAll('.app-tab')[3])">
+        <div class="user-av" id="hdr-av">A</div>
+        <span class="user-nm" id="hdr-nm">Pioneer</span>
       </div>
-      <button class="btn btn-gold" id="auth-btn" onclick="handleAuth()">Connect Wallet</button>
-      <button class="btn btn-outline" id="post-btn" onclick="openPostModal()" style="display:none">+ Post Task</button>
+      <button class="btn btn-outline btn-sm" onclick="openPostModal()">+ Post</button>
+      <button class="btn btn-ghost btn-sm" onclick="doSignOut()">Out</button>
     </div>
   </header>
 
-  <div class="stats-bar">
-    <div class="stats-inner">
-      <div class="stat-item"><span class="stat-val" style="color:var(--green)" id="stat-live">7</span><span class="stat-label">Live Tasks</span></div>
-      <div class="stat-item"><span class="stat-val" id="stat-total">7</span><span class="stat-label">Total Posted</span></div>
-      <div class="stat-item"><span class="stat-val" style="color:var(--gold)" id="stat-pi">37.5</span><span class="stat-label">π In Bounties</span></div>
-      <div class="stat-item"><span class="stat-val" style="color:var(--muted)">1,204</span><span class="stat-label">Pioneers Active</span></div>
-    </div>
-  </div>
-
-  <div class="tabs">
-    <button class="tab-btn active" onclick="switchTab('browse',this)">Browse Tasks</button>
-    <button class="tab-btn" onclick="switchTab('mine',this)">My Tasks <span id="mine-count">(0)</span></button>
-    <button class="tab-btn" onclick="switchTab('board',this)">Leaderboard</button>
-  </div>
-
-  <main>
-    <div class="section active" id="sec-browse">
-      <div class="filter-row" id="filters"></div>
-      <div class="task-grid" id="task-grid"></div>
-    </div>
-    <div class="section" id="sec-mine">
-      <div class="section-eyebrow">YOUR ACTIVE TASKS</div>
-      <div id="my-tasks-list"></div>
-      <div class="earnings-card" id="earnings-card" style="display:none">
-        <div><div class="earn-val" id="earn-val">π 0.0</div><div class="earn-key">IN ESCROW</div></div>
-        <div><div class="earn-val" id="earn-count" style="color:var(--white)">0</div><div class="earn-key">TASKS CLAIMED</div></div>
+  <div class="dashboard">
+    <div class="dash-inner">
+      <div class="dash-greeting">Welcome, <em id="dash-name">Pioneer</em></div>
+      <div class="dash-stats">
+        <div class="dstat"><div class="dstat-val" style="color:var(--green)" id="ds-live">—</div><div class="dstat-key">Live Tasks</div></div>
+        <div class="dstat"><div class="dstat-val" style="color:var(--gold)" id="ds-pi">—</div><div class="dstat-key">π In Bounties</div></div>
+        <div class="dstat"><div class="dstat-val" id="ds-claims">0</div><div class="dstat-key">My Claims</div></div>
+        <div class="dstat"><div class="dstat-val" style="color:var(--gold)" id="ds-earn">0.0</div><div class="dstat-key">π Earned</div></div>
+      </div>
+      <div class="dash-actions">
+        <button class="btn btn-gold btn-sm" onclick="openPostModal()">+ Post Task</button>
+        <button class="btn btn-ghost btn-sm" onclick="switchAppTab('browse',document.querySelectorAll('.app-tab')[0])">Browse</button>
+        <button class="btn btn-ghost btn-sm" onclick="switchAppTab('mine',document.querySelectorAll('.app-tab')[1])">My Tasks</button>
+        <button class="btn btn-ghost btn-sm" onclick="switchAppTab('board',document.querySelectorAll('.app-tab')[2])">Leaderboard</button>
       </div>
     </div>
-    <div class="section" id="sec-board">
-      <div class="section-eyebrow">TOP EARNERS THIS WEEK</div>
-      <div id="lb-list"></div>
-      <div style="margin-top:20px;font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted2);text-align:center">Complete tasks to climb the board</div>
-    </div>
-  </main>
-
-  <div style="border-top:1px solid var(--border);padding:14px 24px;text-align:center">
-    <span style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--muted2);letter-spacing:2px">THE ARENA · BUILT FOR PI NETWORK · Pi SDK v2.0</span>
   </div>
+
+  <div class="search-bar">
+    <div class="search-inner">
+      <div class="search-box">
+        <span style="color:var(--muted)">⌕</span>
+        <input placeholder="Search tasks by title or skill..." id="search-inp" oninput="handleSearch(this.value)"/>
+      </div>
+      <select class="finput" style="width:150px;padding:9px 12px" id="sort-sel" onchange="loadTasks()">
+        <option value="newest">Newest First</option>
+        <option value="bounty">Highest Bounty</option>
+        <option value="deadline">Ending Soon</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="app-tabs">
+    <button class="app-tab active" onclick="switchAppTab('browse',this)">Browse Tasks</button>
+    <button class="app-tab" onclick="switchAppTab('mine',this)">My Tasks <span id="mine-badge">(0)</span></button>
+    <button class="app-tab" onclick="switchAppTab('board',this)">Leaderboard</button>
+    <button class="app-tab" onclick="switchAppTab('profile',this)">Profile</button>
+  </div>
+
+  <div class="app-main">
+
+    <div class="tsec active" id="sec-browse">
+      <div class="fbar" id="fbar"></div>
+      <div class="tgrid" id="tgrid"></div>
+    </div>
+
+    <div class="tsec" id="sec-mine">
+      <div class="sec-eye">YOUR ACTIVE TASKS</div>
+      <div id="mine-wrap"></div>
+      <div class="earn-sum" id="earn-sum" style="display:none">
+        <div><div class="eblock-val" id="es-pi">π 0.0</div><div class="eblock-key">IN ESCROW</div></div>
+        <div><div class="eblock-val" id="es-cnt" style="color:var(--white)">0</div><div class="eblock-key">CLAIMED</div></div>
+        <div><div class="eblock-val" id="es-done" style="color:var(--green)">0</div><div class="eblock-key">COMPLETED</div></div>
+      </div>
+    </div>
+
+    <div class="tsec" id="sec-board">
+      <div class="sec-eye">TOP EARNERS THIS WEEK</div>
+      <div id="lb-wrap"></div>
+      <div style="margin-top:14px;font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted2);text-align:center">Complete tasks to climb the board</div>
+    </div>
+
+    <div class="tsec" id="sec-profile">
+      <div class="prof-layout">
+        <div>
+          <div class="prof-card">
+            <div class="prof-av" id="pav">A</div>
+            <div class="prof-name" id="pnm">Pioneer</div>
+            <div class="prof-handle" id="phdl">@pioneer</div>
+            <div class="prof-stats">
+              <div class="pstat"><div class="pstat-val" id="ps-claimed">0</div><div class="pstat-key">Claimed</div></div>
+              <div class="pstat"><div class="pstat-val" id="ps-done">0</div><div class="pstat-key">Completed</div></div>
+              <div class="pstat"><div class="pstat-val" id="ps-posted">0</div><div class="pstat-key">Posted</div></div>
+              <div class="pstat"><div class="pstat-val" style="color:var(--gold)" id="ps-earn">0</div><div class="pstat-key">π Earned</div></div>
+            </div>
+            <div class="trust-wrap">
+              <div class="trust-lbl"><span>TRUST SCORE</span><span id="p-trust-lbl">0 / 100</span></div>
+              <div class="trust-track"><div class="trust-fill" id="p-trust-fill" style="width:0%"></div></div>
+            </div>
+            <div class="prof-actions">
+              <button class="btn btn-gold btn-full btn-sm" onclick="openPostModal()">+ Post New Task</button>
+              <button class="btn btn-ghost btn-full btn-sm" onclick="doSignOut()">Sign Out</button>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div class="prof-activity">
+            <div class="act-title">Recent Activity</div>
+            <div id="act-list"><div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);padding:16px 0;text-align:center">No activity yet.</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <footer class="app-foot"><span>THE ARENA · Pi Network · MongoDB Atlas · Pi SDK v2.0</span></footer>
 </div>
 
-<!-- POST MODAL -->
-<div class="modal-overlay" id="post-modal">
+<!-- POST TASK MODAL -->
+<div class="overlay" id="m-post">
   <div class="modal">
-    <div class="modal-header"><div class="modal-title">Post a Task</div><button class="modal-close" onclick="closePostModal()">✕</button></div>
-    <div class="form-group"><label class="form-label">Task Title</label><input class="form-input" id="f-title" placeholder="e.g. Translate my app to French"/></div>
-    <div class="form-row">
-      <div class="form-group"><label class="form-label">Category</label><select class="form-select" id="f-cat"><option>Translation</option><option>Design</option><option>Testing</option><option>Data</option><option>Survey</option><option>Writing</option><option>Dev</option></select></div>
-      <div class="form-group"><label class="form-label">Bounty Per Worker (π)</label><input class="form-input" id="f-bounty" type="number" min="0.1" step="0.1" placeholder="e.g. 5.0"/></div>
+    <div class="modal-hd"><div class="modal-title">Post a Task</div><button class="modal-x" onclick="closeModal('m-post')">✕</button></div>
+    <div class="fgroup"><label class="flabel">Task Title *</label><input class="finput" id="pt-title" placeholder="e.g. Translate my app to French"/></div>
+    <div class="frow">
+      <div class="fgroup"><label class="flabel">Category *</label>
+        <select class="fselect" id="pt-cat">
+          <option>Translation</option><option>Design</option><option>Testing</option>
+          <option>Data</option><option>Survey</option><option>Writing</option><option>Dev</option>
+        </select>
+      </div>
+      <div class="fgroup"><label class="flabel">Bounty Per Worker (π) *</label><input class="finput" id="pt-bounty" type="number" min="0.1" step="0.1" placeholder="5.0"/></div>
     </div>
-    <div class="form-row">
-      <div class="form-group"><label class="form-label">Max Workers</label><input class="form-input" id="f-workers" type="number" min="1" max="100" value="1"/></div>
-      <div class="form-group"><label class="form-label">Deadline (Hours)</label><input class="form-input" id="f-hours" type="number" min="1" max="168" value="24"/></div>
+    <div class="frow">
+      <div class="fgroup"><label class="flabel">Max Workers</label><input class="finput" id="pt-workers" type="number" min="1" max="100" value="1"/></div>
+      <div class="fgroup"><label class="flabel">Deadline (Hours)</label><input class="finput" id="pt-hours" type="number" min="1" max="168" value="24"/></div>
     </div>
-    <div class="form-group"><label class="form-label">Description</label><textarea class="form-textarea" id="f-desc" placeholder="Describe exactly what needs to be done..."></textarea></div>
-    <div class="pay-summary">
-      <div class="pay-summary-label">Pi Payment Summary</div>
-      <div class="pay-summary-row"><span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted)" id="pay-calc-label">—</span><span class="pay-summary-amount" id="pay-calc-val">π —</span></div>
-      <div class="pay-note">Full amount escrowed via Pi Network on post.<br>Released to workers upon your approval.<br>Powered by Pi SDK · Pi Browser payment dialog.</div>
+    <div class="fgroup"><label class="flabel">Skills (comma separated)</label><input class="finput" id="pt-skills" placeholder="Spanish, Copywriting"/></div>
+    <div class="fgroup"><label class="flabel">Description *</label><textarea class="ftextarea" id="pt-desc" placeholder="Describe exactly what needs to be done..."></textarea></div>
+    <div class="pay-box">
+      <div class="pay-box-lbl">Pi Payment Summary</div>
+      <div class="pay-box-row">
+        <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted)" id="pt-lbl">—</span>
+        <span class="pay-box-amt" id="pt-amt">π —</span>
+      </div>
+      <div class="pay-note">Full amount escrowed via Pi Network on post.<br>Released to workers upon your approval.<br>Outside Pi Browser: saved directly to database.</div>
     </div>
-    <div class="error-box" id="post-error"></div>
-    <button class="btn btn-gold" style="width:100%;padding:14px;font-size:12px" id="post-submit-btn" onclick="submitPost()">Post & Escrow Bounty →</button>
+    <div class="ferror" id="pt-err"></div>
+    <button class="btn btn-gold btn-full" id="pt-sub" onclick="submitPost()">Post & Escrow Bounty →</button>
   </div>
 </div>
 
 <!-- DETAIL MODAL -->
-<div class="modal-overlay" id="detail-modal">
+<div class="overlay" id="m-detail">
   <div class="modal">
-    <div class="modal-header"><div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted);letter-spacing:2px" id="d-cat"></div><button class="modal-close" onclick="closeDetailModal()">✕</button></div>
-    <div style="font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:1px;color:var(--white);margin-bottom:6px" id="d-title"></div>
-    <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted);margin-bottom:24px">Posted by <span style="color:#888" id="d-poster"></span></div>
-    <div class="detail-stats">
-      <div class="detail-stat"><div class="detail-stat-val" style="color:var(--gold)" id="d-bounty"></div><div class="detail-stat-key">Bounty</div></div>
-      <div class="detail-stat"><div class="detail-stat-val" style="color:var(--green)" id="d-slots"></div><div class="detail-stat-key">Slots Left</div></div>
-      <div class="detail-stat"><div class="detail-stat-val" id="d-timer"></div><div class="detail-stat-key">Deadline</div></div>
+    <div class="modal-hd">
+      <div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--muted);letter-spacing:2px" id="dd-cat"></div>
+      <button class="modal-x" onclick="closeModal('m-detail')">✕</button>
     </div>
-    <div style="font-size:13px;color:#888;line-height:1.9;margin-bottom:24px" id="d-desc"></div>
-    <div class="how-box"><div class="how-title">How Payment Works</div><div class="how-steps">1. Claim this task (free — no Pi needed)<br>2. Complete work within the deadline<br>3. Submit your result to the poster<br>4. Poster approves → π released to your wallet</div></div>
-    <button class="claim-btn" id="d-claim-btn" onclick="claimFromDetail()"></button>
+    <div style="font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:1px;color:var(--white);margin-bottom:5px" id="dd-title"></div>
+    <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted);margin-bottom:22px">Posted by <b style="color:#888" id="dd-poster"></b></div>
+    <div class="dstat-grid">
+      <div class="dstat-cell"><div class="dstat-val" style="color:var(--gold)" id="dd-bounty"></div><div class="dstat-key">Bounty</div></div>
+      <div class="dstat-cell"><div class="dstat-val" style="color:var(--green)" id="dd-slots"></div><div class="dstat-key">Slots Left</div></div>
+      <div class="dstat-cell"><div class="dstat-val" id="dd-timer"></div><div class="dstat-key">Time Left</div></div>
+    </div>
+    <div class="ddesc" id="dd-desc"></div>
+    <div id="dd-skills"></div>
+    <div class="how-box">
+      <div class="how-ttl">How Payment Works</div>
+      <div class="how-steps">1. Claim this task — completely free<br>2. Complete work within the deadline<br>3. Submit your result with proof<br>4. Poster approves → π released to your wallet</div>
+    </div>
+    <button class="cbtn btn-full" id="dd-btn" onclick="claimFromDetail()"></button>
+  </div>
+</div>
+
+<!-- SUBMIT WORK MODAL -->
+<div class="overlay" id="m-submit">
+  <div class="modal">
+    <div class="modal-hd"><div class="modal-title">Submit Work</div><button class="modal-x" onclick="closeModal('m-submit')">✕</button></div>
+    <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);margin-bottom:18px" id="sw-task"></div>
+    <div class="fgroup"><label class="flabel">Work Link (optional)</label><input class="finput" id="sw-link" placeholder="https://drive.google.com/... or any URL"/></div>
+    <div class="fgroup"><label class="flabel">Description of Work Done *</label><textarea class="ftextarea" id="sw-desc" placeholder="Describe what you completed and how it meets the requirements..."></textarea></div>
+    <div class="ferror" id="sw-err"></div>
+    <div class="fsuccess" id="sw-ok"></div>
+    <button class="btn btn-gold btn-full" id="sw-btn" onclick="submitWork()">Submit for Review →</button>
   </div>
 </div>
 
 <div id="toast"></div>
 
 <script>
-// ── Pi SDK Detection ─────────────────────────────────────────────────────────
-const isPiBrowser = typeof window !== 'undefined' && !!window.Pi;
+// ══════════════════════════════════════════════
+// CONFIG — set your Render backend URL here
+// ══════════════════════════════════════════════
+const API = (() => {
+  const hostname = window.location.hostname;
+  if (hostname === 'localhost' || hostname === '127.0.0.1') return 'http://localhost:3000';
+  return 'https://the-arena-api.onrender.com'; // ← change to your Render URL
+})();
 
-if (isPiBrowser) {
-  document.getElementById('main-app').style.display = 'flex';
-  document.getElementById('landing').style.display = 'none';
-  try { Pi.init({ version:"2.0", sandbox:false }); } catch(e) { console.warn(e); }
-} else {
-  document.getElementById('landing').style.display = 'flex';
-  document.getElementById('main-app').style.display = 'none';
-}
+// ══════════════════════════════════════════════
+// PI SDK
+// ══════════════════════════════════════════════
+const isPi = typeof window !== 'undefined' && !!window.Pi;
+if (isPi) { try { Pi.init({ version:"2.0", sandbox:false }); } catch(e){} }
 
-// ── Scroll helpers ────────────────────────────────────────────────────────────
-function scrollToHow() { document.getElementById('how-section').scrollIntoView({behavior:'smooth'}); }
-function scrollToFeatures() { document.getElementById('features-section').scrollIntoView({behavior:'smooth'}); }
-
-// ── State ─────────────────────────────────────────────────────────────────────
-let currentUser = null;
+// ══════════════════════════════════════════════
+// STATE
+// ══════════════════════════════════════════════
+let token = localStorage.getItem('arena_token');
+let currentUser = JSON.parse(localStorage.getItem('arena_user') || 'null');
+let tasks = [];
+let myClaims = [];
 let activeFilter = 'All';
-let detailTaskId = null;
+let searchQ = '';
+let detailId = null;
+let submitId = null;
+let actLog = [];
+
 const CATS = ['All','Translation','Design','Testing','Data','Survey','Writing','Dev'];
 
-let tasks = [
-  {id:1,title:"Translate product description to Spanish",cat:"Translation",bounty:3.5,poster:"Pioneer_4821",desc:"Need a native Spanish speaker to translate 200-word product description. Accuracy and natural tone required.",skills:["Spanish","Copywriting"],claims:0,max:1,deadline:Date.now()+1000*60*47,claimed:false,hot:true},
-  {id:2,title:"Test my Pi web app on mobile & report bugs",cat:"Testing",bounty:5.0,poster:"Pioneer_0193",desc:"Load my app in Pi Browser, test all features, submit structured bug report with screenshots.",skills:["QA","Pi Browser"],claims:0,max:3,deadline:Date.now()+1000*60*120,claimed:false,hot:false},
-  {id:3,title:"Design a logo for my Pi marketplace",cat:"Design",bounty:12.0,poster:"Pioneer_7742",desc:"Need minimal, modern logo. Deliver SVG + PNG. Color: gold on dark. No gradients, clean geometry.",skills:["Figma","Illustration"],claims:1,max:1,deadline:Date.now()+1000*60*60*8,claimed:false,hot:true},
-  {id:4,title:"Fill out 5-min product survey",cat:"Survey",bounty:0.5,poster:"Pioneer_3310",desc:"Quick survey about Pi app usage habits. Honest answers only. Takes approximately 5 minutes.",skills:["Pi User"],claims:18,max:50,deadline:Date.now()+1000*60*60*3,claimed:false,hot:false},
-  {id:5,title:"Write a 300-word review of Pi Browser",cat:"Writing",bounty:2.0,poster:"Pioneer_9901",desc:"Honest, detailed review for a tech blog. Must be original content, no plagiarism.",skills:["Writing","English"],claims:0,max:5,deadline:Date.now()+1000*60*60*6,claimed:false,hot:false},
-  {id:6,title:"Label 100 images for AI training dataset",cat:"Data",bounty:8.0,poster:"Pioneer_5566",desc:"Tag objects in 100 images using our web tool. Clear labeling instructions provided.",skills:["Detail","Focus"],claims:3,max:10,deadline:Date.now()+1000*60*60*12,claimed:false,hot:false},
-  {id:7,title:"Fix CSS layout bug in Pi storefront app",cat:"Dev",bounty:6.5,poster:"Pioneer_2288",desc:"Mobile nav menu breaks on iOS Safari. Share fix as code snippet or PR. Must be tested.",skills:["CSS","HTML","Safari"],claims:0,max:1,deadline:Date.now()+1000*60*60*4,claimed:false,hot:true},
+// Seed tasks for offline/demo mode
+const SEEDS = [
+  {_id:'s1',title:'Translate product desc to Spanish',category:'Translation',bounty:3.5,posterName:'Pioneer_4821',description:'Native Spanish speaker needed to translate 200-word product description.',skills:['Spanish','Copywriting'],claimsCount:0,maxClaims:1,deadline:new Date(Date.now()+1000*60*47).toISOString(),hot:true},
+  {_id:'s2',title:'Test Pi web app & report bugs',category:'Testing',bounty:5.0,posterName:'Pioneer_0193',description:'Test all features in Pi Browser, submit structured bug report.',skills:['QA','Pi Browser'],claimsCount:0,maxClaims:3,deadline:new Date(Date.now()+1000*60*130).toISOString(),hot:false},
+  {_id:'s3',title:'Design logo for Pi marketplace',category:'Design',bounty:12.0,posterName:'Pioneer_7742',description:'Minimal modern logo. SVG + PNG. Gold on dark. Clean geometry only.',skills:['Figma','Illustration'],claimsCount:1,maxClaims:1,deadline:new Date(Date.now()+1000*60*60*8).toISOString(),hot:true},
+  {_id:'s4',title:'Fill out 5-min product survey',category:'Survey',bounty:0.5,posterName:'Pioneer_3310',description:'Survey about Pi app usage. Honest answers only.',skills:['Pi User'],claimsCount:18,maxClaims:50,deadline:new Date(Date.now()+1000*60*60*3).toISOString(),hot:false},
+  {_id:'s5',title:'Write 300-word Pi Browser review',category:'Writing',bounty:2.0,posterName:'Pioneer_9901',description:'Original honest review for a tech blog. English only.',skills:['Writing','English'],claimsCount:0,maxClaims:5,deadline:new Date(Date.now()+1000*60*60*6).toISOString(),hot:false},
+  {_id:'s6',title:'Label 100 images for AI dataset',category:'Data',bounty:8.0,posterName:'Pioneer_5566',description:'Tag objects in 100 images. Clear guide provided.',skills:['Detail'],claimsCount:3,maxClaims:10,deadline:new Date(Date.now()+1000*60*60*12).toISOString(),hot:false},
+  {_id:'s7',title:'Fix CSS bug in Pi storefront',category:'Dev',bounty:6.5,posterName:'Pioneer_2288',description:'Mobile nav breaks on iOS Safari. Provide code fix.',skills:['CSS','HTML','Safari'],claimsCount:0,maxClaims:1,deadline:new Date(Date.now()+1000*60*60*4).toISOString(),hot:true},
 ];
 
-// ── Helpers ───────────────────────────────────────────────────────────────────
-function countdown(ms) {
-  if(ms<=0) return 'Expired';
-  const h=Math.floor(ms/3600000),m=Math.floor((ms%3600000)/60000),s=Math.floor((ms%60000)/1000);
+// ══════════════════════════════════════════════
+// HELPERS
+// ══════════════════════════════════════════════
+function toast(msg, t='s') {
+  const el = document.getElementById('toast');
+  el.textContent = msg; el.className = 'show t-'+t;
+  setTimeout(() => el.className = '', 3500);
+}
+
+function cd(iso) {
+  const ms = new Date(iso).getTime() - Date.now();
+  if (ms <= 0) return 'Expired';
+  const h=Math.floor(ms/3600000), m=Math.floor((ms%3600000)/60000), s=Math.floor((ms%60000)/1000);
   if(h>0) return h+'h '+m+'m'; if(m>0) return m+'m '+s+'s'; return s+'s';
 }
-function urgClass(ms) { return ms<1000*60*30?'urgent':ms<1000*60*60*2?'warning':'safe'; }
-function urgColor(ms) { return ms<1000*60*30?'var(--red)':ms<1000*60*60*2?'var(--gold)':'var(--green)'; }
-function progColor(p) { return p>80?'var(--red)':p>50?'var(--gold)':'var(--green)'; }
+function tcls(iso){const ms=new Date(iso).getTime()-Date.now();return ms<1800000?'tb-urg':ms<7200000?'tb-warn':'tb-safe';}
+function tcol(iso){const ms=new Date(iso).getTime()-Date.now();return ms<1800000?'var(--red)':ms<7200000?'var(--gold)':'var(--green)';}
+function pcol(p){return p>80?'var(--red)':p>50?'var(--gold)':'var(--green)';}
 
-function showToast(msg,type='success') {
-  const t=document.getElementById('toast');
-  t.textContent=msg; t.className='show '+type;
-  setTimeout(()=>{t.className='';},3200);
-}
-
-// ── Auth ──────────────────────────────────────────────────────────────────────
-async function handleAuth() {
-  if(!isPiBrowser){showToast('Open in Pi Browser','warn');return;}
-  const btn=document.getElementById('auth-btn');
-  btn.textContent='Connecting...'; btn.disabled=true;
-  try {
-    const auth=await Pi.authenticate(['username','payments'],handleIncomplete);
-    currentUser=auth.user;
-    btn.style.display='none';
-    document.getElementById('user-display').style.display='block';
-    document.getElementById('username-display').textContent=auth.user.username;
-    document.getElementById('post-btn').style.display='inline-block';
-    showToast('Welcome, '+auth.user.username+'!','success');
-    renderAll();
-  } catch(e) { btn.textContent='Connect Wallet'; btn.disabled=false; showToast('Auth failed','error'); }
-}
-
-async function handleIncomplete(p) {
-  try { await fetch('/.netlify/functions/payments/incomplete',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({paymentId:p.identifier})}); }
-  catch(e){console.warn(e);}
-}
-
-// ── Payment ───────────────────────────────────────────────────────────────────
-async function createPiPayment(amount,memo,metadata) {
-  return new Promise((resolve,reject)=>{
-    Pi.createPayment({amount,memo,metadata},{
-      onReadyForServerApproval:async(paymentId)=>{
-        try{ await fetch('/.netlify/functions/payments/approve',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({paymentId,metadata})}); }catch(e){reject(e);}
-      },
-      onReadyForServerCompletion:async(paymentId,txid)=>{
-        try{ await fetch('/.netlify/functions/payments/complete',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({paymentId,txid})}); resolve(txid); }catch(e){reject(e);}
-      },
-      onCancel:()=>reject(new Error('Payment cancelled')),
-      onError:(e)=>reject(e)
-    });
+function showPage(id) {
+  ['pg-landing','pg-auth','pg-app'].forEach(p=>{
+    document.getElementById(p).style.display='none';
   });
+  const el = document.getElementById(id);
+  el.style.display = 'flex';
+  el.style.flexDirection = 'column';
 }
 
-// ── Tabs ──────────────────────────────────────────────────────────────────────
-function switchTab(id,btn) {
-  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
-  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
-  btn.classList.add('active');
-  document.getElementById('sec-'+id).classList.add('active');
+function showAuth(tab) { showPage('pg-auth'); switchAuthTab(tab); }
+
+function switchAuthTab(tab) {
+  document.getElementById('pn-signin').style.display = tab==='signin'?'block':'none';
+  document.getElementById('pn-signup').style.display = tab==='signup'?'block':'none';
+  document.getElementById('at-si').classList.toggle('active', tab==='signin');
+  document.getElementById('at-su').classList.toggle('active', tab==='signup');
 }
 
-// ── Filters & Grid ────────────────────────────────────────────────────────────
+function openModal(id){ document.getElementById(id).classList.add('open'); }
+function closeModal(id){ document.getElementById(id).classList.remove('open'); }
+
+['m-post','m-detail','m-submit'].forEach(id=>{
+  document.getElementById(id).addEventListener('click',function(e){if(e.target===this)closeModal(id);});
+});
+
+// ══════════════════════════════════════════════
+// API CALLS
+// ══════════════════════════════════════════════
+async function api(method, path, body) {
+  const opts = {
+    method,
+    headers: { 'Content-Type':'application/json', ...(token?{Authorization:'Bearer '+token}:{}) }
+  };
+  if (body) opts.body = JSON.stringify(body);
+  try {
+    const res = await fetch(API + path, opts);
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Request failed');
+    return data;
+  } catch(e) {
+    console.warn('API error:', e.message);
+    throw e;
+  }
+}
+
+// ══════════════════════════════════════════════
+// AUTH
+// ══════════════════════════════════════════════
+async function doSignUp() {
+  const name = document.getElementById('su-name').value.trim();
+  const email = document.getElementById('su-email').value.trim();
+  const pass = document.getElementById('su-pass').value;
+  const err = document.getElementById('su-err');
+  const ok = document.getElementById('su-ok');
+  const btn = document.getElementById('su-btn');
+  err.style.display='none'; ok.style.display='none';
+  if(!name||!email||!pass){err.textContent='⚠ All fields required.';err.style.display='block';return;}
+  if(pass.length<6){err.textContent='⚠ Password min 6 characters.';err.style.display='block';return;}
+  btn.innerHTML='<span class="loader"></span>'; btn.disabled=true;
+  try {
+    const data = await api('POST','/api/auth/register',{displayName:name,email,password:pass});
+    token=data.token; currentUser=data.user;
+    localStorage.setItem('arena_token',token);
+    localStorage.setItem('arena_user',JSON.stringify(currentUser));
+    enterApp();
+  } catch(e) {
+    err.textContent='⚠ '+(e.message||'Sign up failed'); err.style.display='block';
+    btn.innerHTML='Create Account →'; btn.disabled=false;
+  }
+}
+
+async function doSignIn() {
+  const email = document.getElementById('si-email').value.trim();
+  const pass = document.getElementById('si-pass').value;
+  const err = document.getElementById('si-err');
+  const btn = document.getElementById('si-btn');
+  err.style.display='none';
+  if(!email||!pass){err.textContent='⚠ Enter email and password.';err.style.display='block';return;}
+  btn.innerHTML='<span class="loader"></span>'; btn.disabled=true;
+  try {
+    const data = await api('POST','/api/auth/login',{email,password:pass});
+    token=data.token; currentUser=data.user;
+    localStorage.setItem('arena_token',token);
+    localStorage.setItem('arena_user',JSON.stringify(currentUser));
+    enterApp();
+  } catch(e) {
+    err.textContent='⚠ '+(e.message||'Sign in failed'); err.style.display='block';
+    btn.innerHTML='Sign In →'; btn.disabled=false;
+  }
+}
+
+async function doPiAuth() {
+  if(!isPi){toast('Open in Pi Browser for Pi Wallet','w');return;}
+  try {
+    const auth = await Pi.authenticate(['username','payments'], handleIncomplete);
+    const data = await api('POST','/api/auth/pi',{
+      piUid:auth.user.uid, piUsername:auth.user.username, accessToken:auth.accessToken
+    });
+    token=data.token; currentUser=data.user;
+    localStorage.setItem('arena_token',token);
+    localStorage.setItem('arena_user',JSON.stringify(currentUser));
+    enterApp();
+    toast('Pi Wallet connected!','s');
+  } catch(e) { toast('Pi auth failed: '+e.message,'e'); }
+}
+
+async function handleIncomplete(payment) {
+  try { await api('POST','/api/payments/incomplete',{paymentId:payment.identifier}); } catch(e){}
+}
+
+function doSignOut() {
+  token=null; currentUser=null; tasks=[]; myClaims=[];
+  localStorage.removeItem('arena_token');
+  localStorage.removeItem('arena_user');
+  showPage('pg-landing');
+  toast('Signed out','s');
+}
+
+// ══════════════════════════════════════════════
+// ENTER APP
+// ══════════════════════════════════════════════
+function enterApp() {
+  showPage('pg-app');
+  const name = currentUser?.displayName || 'Pioneer';
+  const init = name.charAt(0).toUpperCase();
+  document.getElementById('hdr-av').textContent = init;
+  document.getElementById('hdr-nm').textContent = name;
+  document.getElementById('dash-name').textContent = name;
+  document.getElementById('pav').textContent = init;
+  document.getElementById('pnm').textContent = name;
+  document.getElementById('phdl').textContent = '@'+name.toLowerCase().replace(/\s/g,'_');
+  loadTasks();
+  loadMyClaims();
+  loadLeaderboard();
+}
+
+// ══════════════════════════════════════════════
+// LOAD TASKS
+// ══════════════════════════════════════════════
+async function loadTasks() {
+  const cat = activeFilter !== 'All' ? '&category='+activeFilter : '';
+  const sort = document.getElementById('sort-sel')?.value || 'newest';
+  const search = searchQ ? '&search='+encodeURIComponent(searchQ) : '';
+  try {
+    const data = await api('GET', `/api/tasks?sort=${sort}${cat}${search}`);
+    tasks = data.tasks.map(t => ({
+      ...t,
+      claimed: myClaims.some(c => c.taskId?._id === t._id || c.taskId === t._id)
+    }));
+    renderGrid();
+    updateDashStats();
+  } catch(e) {
+    // Fallback to seeds if API unreachable
+    tasks = SEEDS.map(t => ({...t, claimed: false}));
+    renderGrid();
+    updateDashStats();
+    console.warn('Using seed tasks — backend may not be running');
+  }
+}
+
+async function loadMyClaims() {
+  try {
+    const data = await api('GET','/api/claims/mine');
+    myClaims = data.claims;
+    renderMyTasks();
+  } catch(e) {
+    myClaims = [];
+    renderMyTasks();
+  }
+}
+
+async function loadLeaderboard() {
+  try {
+    const data = await api('GET','/api/leaderboard');
+    renderLeaderboard(data.users);
+  } catch(e) {
+    renderLeaderboard([]);
+  }
+}
+
+// ══════════════════════════════════════════════
+// RENDER
+// ══════════════════════════════════════════════
+function handleSearch(v){ searchQ=v; clearTimeout(window._st); window._st=setTimeout(loadTasks,400); }
+
+function updateDashStats() {
+  const live = tasks.filter(t=>(t.claimsCount||0)<(t.maxClaims||1)).length;
+  const totalPi = tasks.reduce((a,t)=>a+(t.bounty||0),0);
+  const mine = tasks.filter(t=>t.claimed);
+  document.getElementById('ds-live').textContent = live;
+  document.getElementById('ds-pi').textContent = totalPi.toFixed(1);
+  document.getElementById('ds-claims').textContent = mine.length;
+  document.getElementById('ds-earn').textContent = mine.reduce((a,t)=>a+(t.bounty||0),0).toFixed(1);
+  document.getElementById('ls-tasks').textContent = live;
+  document.getElementById('ls-pi').textContent = totalPi.toFixed(1);
+}
+
 function renderFilters() {
-  document.getElementById('filters').innerHTML=CATS.map(c=>`<button class="filter-btn ${c===activeFilter?'active':''}" onclick="setFilter('${c}')">${c}</button>`).join('')+`<span class="filter-count" id="filter-count"></span>`;
+  document.getElementById('fbar').innerHTML =
+    CATS.map(c=>`<button class="fchip ${c===activeFilter?'active':''}" onclick="setFilter('${c}')">${c}</button>`).join('') +
+    `<span class="rcount" id="rc"></span>`;
 }
 
-function setFilter(cat){activeFilter=cat;renderFilters();renderGrid();}
+function setFilter(c){ activeFilter=c; renderFilters(); loadTasks(); }
 
 function renderGrid(newIds=new Set()) {
-  const filtered=tasks.filter(t=>activeFilter==='All'||t.cat===activeFilter);
-  document.getElementById('filter-count').textContent=filtered.length+' tasks';
-  const grid=document.getElementById('task-grid');
-  if(!filtered.length){grid.innerHTML=`<div class="empty"><div class="empty-icon">⬡</div><div class="empty-text">No tasks in this category</div></div>`;return;}
-  grid.innerHTML=filtered.map(t=>{
-    const rem=t.deadline-Date.now(),pct=Math.round((t.claims/t.max)*100),full=t.claims>=t.max,isNew=newIds.has(t.id);
-    return `<div class="task-card ${t.hot?'hot':''} ${isNew?'new-card':''}" onclick="openDetail(${t.id})">
-      <div class="card-meta">
-        <span class="tag">${t.cat.toUpperCase()}</span>
-        ${t.hot?'<span class="tag tag-hot">HOT</span>':''}
-        ${isNew?'<span class="tag tag-new">NEW</span>':''}
-        <span class="timer ${urgClass(rem)}">⏱ ${countdown(rem)}</span>
+  renderFilters();
+  document.getElementById('rc').textContent = tasks.length+' tasks';
+  const grid = document.getElementById('tgrid');
+  if(!tasks.length){
+    grid.innerHTML=`<div class="empty"><div class="empty-ico">⬡</div><div class="empty-msg">No tasks found</div></div>`;
+    return;
+  }
+  grid.innerHTML = tasks.map(t=>{
+    const pct=Math.round(((t.claimsCount||0)/(t.maxClaims||1))*100);
+    const full=(t.claimsCount||0)>=(t.maxClaims||1);
+    const isNew=newIds.has(t._id);
+    const id=t._id;
+    return `<div class="tcard ${t.hot?'hot':''} ${isNew?'fresh':''}" onclick="openDetail('${id}')">
+      <div class="ctags">
+        <span class="ctag">${t.category}</span>
+        ${t.hot?'<span class="ctag ctag-hot">HOT</span>':''}
+        ${isNew?'<span class="ctag ctag-new">NEW</span>':''}
+        <span class="tbadge ${tcls(t.deadline)}">⏱ ${cd(t.deadline)}</span>
       </div>
-      <div class="card-top">
-        <div><div class="card-title">${t.title}</div><div class="card-poster">by <span>${t.poster}</span></div></div>
-        <div class="bounty-block"><div class="bounty-amount">π${t.bounty.toFixed(1)}</div><div class="bounty-label">BOUNTY</div></div>
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:10px">
+        <div style="flex:1"><div class="ctitle">${t.title}</div><div class="cposter">by <b>${t.posterName||'Pioneer'}</b></div></div>
+        <div style="text-align:right;flex-shrink:0"><div class="cbounty">π${(t.bounty||0).toFixed(1)}</div><div class="cbounty-key">BOUNTY</div></div>
       </div>
-      <div class="progress-wrap">
-        <div class="progress-row"><span>${t.claims}/${t.max} claimed</span><span>${t.max-t.claims} left</span></div>
-        <div class="progress-track"><div class="progress-fill" style="width:${pct}%;background:${progColor(pct)}"></div></div>
-      </div>
-      <div class="skills">${t.skills.map(s=>`<span class="skill">${s}</span>`).join('')}</div>
-      <button class="claim-btn ${t.claimed?'claimed':full?'full':'open'}" onclick="event.stopPropagation();claimTask(${t.id})" ${t.claimed||full?'disabled':''}>
+      <div class="prow"><span>${t.claimsCount||0}/${t.maxClaims||1} claimed</span><span>${(t.maxClaims||1)-(t.claimsCount||0)} left</span></div>
+      <div class="ptrack"><div class="pfill" style="width:${pct}%;background:${pcol(pct)}"></div></div>
+      <div class="stags">${(t.skills||[]).map(s=>`<span class="stag">${s}</span>`).join('')}</div>
+      <button class="cbtn ${t.claimed?'cb-done':full?'cb-full':'cb-open'}"
+        onclick="event.stopPropagation();claimTask('${id}')" ${t.claimed||full?'disabled':''}>
         ${t.claimed?'✓ CLAIMED':full?'FULL':'CLAIM TASK'}
       </button>
     </div>`;
   }).join('');
 }
 
-// ── Claim ─────────────────────────────────────────────────────────────────────
-function claimTask(id) {
-  if(!currentUser){showToast('Connect wallet first','warn');return;}
-  const t=tasks.find(x=>x.id===id);
-  if(!t||t.claimed||t.claims>=t.max)return;
-  t.claimed=true;t.claims++;
-  renderAll();
-  showToast('Task claimed! π'+t.bounty.toFixed(1)+' in escrow for you.','success');
-}
-
-// ── Detail Modal ──────────────────────────────────────────────────────────────
-function openDetail(id) {
-  const t=tasks.find(x=>x.id===id);if(!t)return;
-  detailTaskId=id;
-  const rem=t.deadline-Date.now(),full=t.claims>=t.max;
-  document.getElementById('d-cat').textContent=t.cat.toUpperCase();
-  document.getElementById('d-title').textContent=t.title;
-  document.getElementById('d-poster').textContent=t.poster;
-  document.getElementById('d-bounty').textContent='π '+t.bounty.toFixed(1);
-  document.getElementById('d-slots').textContent=t.max-t.claims;
-  const dt=document.getElementById('d-timer');
-  dt.textContent=countdown(rem);dt.style.color=urgColor(rem);
-  document.getElementById('d-desc').textContent=t.desc;
-  const cb=document.getElementById('d-claim-btn');
-  if(t.claimed){cb.textContent='✓ ALREADY CLAIMED';cb.className='claim-btn claimed';cb.disabled=true;}
-  else if(full){cb.textContent='NO SLOTS AVAILABLE';cb.className='claim-btn full';cb.disabled=true;}
-  else{cb.textContent='CLAIM & START WORKING →';cb.className='claim-btn open';cb.disabled=false;}
-  document.getElementById('detail-modal').classList.add('open');
-}
-
-function closeDetailModal(){document.getElementById('detail-modal').classList.remove('open');detailTaskId=null;}
-function claimFromDetail(){if(detailTaskId){claimTask(detailTaskId);closeDetailModal();}}
-
-// ── Post Modal ────────────────────────────────────────────────────────────────
-function openPostModal(){if(!currentUser){showToast('Connect wallet first','warn');return;}document.getElementById('post-modal').classList.add('open');updatePayCalc();}
-function closePostModal(){document.getElementById('post-modal').classList.remove('open');document.getElementById('post-error').style.display='none';document.getElementById('post-submit-btn').textContent='Post & Escrow Bounty →';document.getElementById('post-submit-btn').disabled=false;}
-function updatePayCalc(){const b=parseFloat(document.getElementById('f-bounty').value)||0,w=parseInt(document.getElementById('f-workers').value)||1;document.getElementById('pay-calc-label').textContent='π'+b.toFixed(1)+' × '+w+' worker'+(w>1?'s':'');document.getElementById('pay-calc-val').textContent='π '+(b*w).toFixed(1);}
-document.getElementById('f-bounty').addEventListener('input',updatePayCalc);
-document.getElementById('f-workers').addEventListener('input',updatePayCalc);
-
-async function submitPost() {
-  const title=document.getElementById('f-title').value.trim();
-  const bounty=parseFloat(document.getElementById('f-bounty').value);
-  const workers=parseInt(document.getElementById('f-workers').value);
-  const hours=parseInt(document.getElementById('f-hours').value);
-  const cat=document.getElementById('f-cat').value;
-  const desc=document.getElementById('f-desc').value.trim();
-  const errBox=document.getElementById('post-error');
-  if(!title||!bounty||!desc){errBox.textContent='⚠ Please fill in all required fields.';errBox.style.display='block';return;}
-  errBox.style.display='none';
-  const btn=document.getElementById('post-submit-btn');
-  btn.textContent='Waiting for Pi Browser approval...';btn.disabled=true;
+// ══════════════════════════════════════════════
+// CLAIM
+// ══════════════════════════════════════════════
+async function claimTask(id) {
+  if(!currentUser){showAuth('signin');return;}
+  const t=tasks.find(x=>x._id===id);
+  if(!t||t.claimed||(t.claimsCount||0)>=(t.maxClaims||1))return;
   try {
-    const txid=await createPiPayment(bounty*workers,'The Arena escrow: '+title,{title,cat,poster:currentUser?.uid,workers,hours});
-    const newTask={id:Date.now(),title,cat,bounty,desc,poster:currentUser?.username||'Pioneer',skills:[],claims:0,max:workers,deadline:Date.now()+hours*3600000,claimed:false,hot:false,txid};
-    tasks.unshift(newTask);
-    document.getElementById('stat-total').textContent=tasks.length;
-    document.getElementById('stat-live').textContent=tasks.length;
-    document.getElementById('stat-pi').textContent=tasks.reduce((a,t)=>a+t.bounty,0).toFixed(1);
-    renderAll(new Set([newTask.id]));
-    closePostModal();
-    showToast('Task posted! π'+(bounty*workers).toFixed(1)+' escrowed.','success');
-    ['f-title','f-bounty','f-desc'].forEach(id=>document.getElementById(id).value='');
-    document.getElementById('f-workers').value=1;document.getElementById('f-hours').value=24;
-  } catch(e){errBox.textContent='⚠ '+(e.message||'Payment failed.');errBox.style.display='block';btn.textContent='Post & Escrow Bounty →';btn.disabled=false;}
+    await api('POST',`/api/tasks/${id}/claim`);
+    t.claimed=true; t.claimsCount=(t.claimsCount||0)+1;
+    myClaims.push({taskId:t,status:'in_progress'});
+    logActivity('Claimed: '+t.title, t.bounty);
+    renderGrid();
+    renderMyTasks();
+    updateDashStats();
+    toast('Task claimed! π'+t.bounty.toFixed(1)+' in escrow.','s');
+  } catch(e) { toast('Claim failed: '+e.message,'e'); }
 }
 
-// ── My Tasks ──────────────────────────────────────────────────────────────────
-function renderMyTasks() {
-  const mine=tasks.filter(t=>t.claimed);
-  document.getElementById('mine-count').textContent='('+mine.length+')';
-  if(!mine.length){
-    document.getElementById('my-tasks-list').innerHTML=`<div style="text-align:center;padding:80px 0"><div style="font-family:'Bebas Neue',sans-serif;font-size:48px;color:var(--border2);margin-bottom:12px">⬡</div><div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);margin-bottom:20px">No claimed tasks yet.</div><button class="btn btn-gold" onclick="switchTab('browse',document.querySelectorAll('.tab-btn')[0])">Browse Tasks →</button></div>`;
-    document.getElementById('earnings-card').style.display='none';return;
+function switchAppTab(id, btn) {
+  document.querySelectorAll('.app-tab').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.tsec').forEach(s=>s.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+  document.getElementById('sec-'+id).classList.add('active');
+  if(id==='profile') renderProfile();
+  if(id==='board') loadLeaderboard();
+}
+
+// ══════════════════════════════════════════════
+// DETAIL
+// ══════════════════════════════════════════════
+function openDetail(id) {
+  const t=tasks.find(x=>x._id===id);
+  if(!t) return;
+  detailId=id;
+  const full=(t.claimsCount||0)>=(t.maxClaims||1);
+  document.getElementById('dd-cat').textContent=t.category.toUpperCase();
+  document.getElementById('dd-title').textContent=t.title;
+  document.getElementById('dd-poster').textContent=t.posterName||'Pioneer';
+  document.getElementById('dd-bounty').textContent='π '+(t.bounty||0).toFixed(1);
+  document.getElementById('dd-slots').textContent=(t.maxClaims||1)-(t.claimsCount||0);
+  const tm=document.getElementById('dd-timer');
+  tm.textContent=cd(t.deadline); tm.style.color=tcol(t.deadline);
+  document.getElementById('dd-desc').textContent=t.description;
+  const sk=document.getElementById('dd-skills');
+  sk.innerHTML=(t.skills||[]).length?`<div class="stags">${t.skills.map(s=>`<span class="stag">${s}</span>`).join('')}</div>`:'';
+  const b=document.getElementById('dd-btn');
+  if(t.claimed){b.textContent='✓ ALREADY CLAIMED';b.className='cbtn cb-done btn-full';b.disabled=true;}
+  else if(full){b.textContent='NO SLOTS AVAILABLE';b.className='cbtn cb-full btn-full';b.disabled=true;}
+  else{b.textContent='CLAIM & START WORKING →';b.className='cbtn cb-open btn-full';b.disabled=false;}
+  openModal('m-detail');
+}
+
+function claimFromDetail(){if(detailId){claimTask(detailId);closeModal('m-detail');}}
+
+// ══════════════════════════════════════════════
+// POST TASK
+// ══════════════════════════════════════════════
+function openPostModal(){
+  if(!currentUser){showAuth('signin');return;}
+  openModal('m-post'); updatePayCalc();
+}
+
+function updatePayCalc(){
+  const b=parseFloat(document.getElementById('pt-bounty').value)||0;
+  const w=parseInt(document.getElementById('pt-workers').value)||1;
+  document.getElementById('pt-lbl').textContent='π'+b.toFixed(1)+'×'+w+'worker'+(w>1?'s':'');
+  document.getElementById('pt-amt').textContent='π '+(b*w).toFixed(1);
+}
+
+document.getElementById('pt-bounty').addEventListener('input',updatePayCalc);
+document.getElementById('pt-workers').addEventListener('input',updatePayCalc);
+
+async function submitPost(){
+  const title=document.getElementById('pt-title').value.trim();
+  const cat=document.getElementById('pt-cat').value;
+  const bounty=parseFloat(document.getElementById('pt-bounty').value);
+  const workers=parseInt(document.getElementById('pt-workers').value)||1;
+  const hours=parseInt(document.getElementById('pt-hours').value)||24;
+  const skills=document.getElementById('pt-skills').value;
+  const desc=document.getElementById('pt-desc').value.trim();
+  const err=document.getElementById('pt-err');
+  const btn=document.getElementById('pt-sub');
+  err.style.display='none';
+  if(!title||!bounty||!desc){err.textContent='⚠ Fill in all required fields.';err.style.display='block';return;}
+
+  btn.innerHTML='<span class="loader"></span>'; btn.disabled=true;
+
+  // Pi Payment if in Pi Browser
+  let txid='no-pi-'+Date.now();
+  if(isPi){
+    try{
+      txid=await createPiPayment(bounty*workers,'The Arena escrow: '+title,{title,category:cat});
+    }catch(e){
+      err.textContent='⚠ Payment: '+e.message; err.style.display='block';
+      btn.innerHTML='Post & Escrow Bounty →'; btn.disabled=false; return;
+    }
   }
-  document.getElementById('my-tasks-list').innerHTML=mine.map(t=>{
-    const rem=t.deadline-Date.now();
-    return `<div class="my-task-card"><div class="my-task-header"><span style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--muted);letter-spacing:2px">${t.cat.toUpperCase()}</span><span class="status-badge progress">✓ IN PROGRESS</span></div><div class="my-task-title">${t.title}</div><div class="my-task-footer"><span class="timer ${urgClass(rem)}">⏱ ${countdown(rem)}</span><div style="display:flex;align-items:center;gap:14px"><span style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--gold)">π ${t.bounty.toFixed(1)}</span><button class="submit-btn">Submit Work →</button></div></div></div>`;
-  }).join('');
-  const total=mine.reduce((a,t)=>a+t.bounty,0);
-  document.getElementById('earn-val').textContent='π '+total.toFixed(1);
-  document.getElementById('earn-count').textContent=mine.length;
-  document.getElementById('earnings-card').style.display='flex';
+
+  try {
+    const data = await api('POST','/api/tasks',{
+      title, category:cat, bounty, description:desc,
+      skills:skills?skills.split(',').map(s=>s.trim()).filter(Boolean):[],
+      maxClaims:workers, deadlineHours:hours, txid
+    });
+    const nt={...data.task, claimed:false};
+    tasks.unshift(nt);
+    renderGrid(new Set([nt._id]));
+    updateDashStats();
+    closeModal('m-post');
+    logActivity('Posted: '+title, bounty);
+    toast('Task posted! π'+(bounty*workers).toFixed(1)+' escrowed.','s');
+    ['pt-title','pt-bounty','pt-skills','pt-desc'].forEach(i=>document.getElementById(i).value='');
+    document.getElementById('pt-workers').value=1;
+    document.getElementById('pt-hours').value=24;
+  } catch(e){
+    err.textContent='⚠ '+(e.message||'Post failed'); err.style.display='block';
+  }
+  btn.innerHTML='Post & Escrow Bounty →'; btn.disabled=false;
 }
 
-// ── Leaderboard ───────────────────────────────────────────────────────────────
-function renderLeaderboard() {
+// ══════════════════════════════════════════════
+// PI PAYMENT
+// ══════════════════════════════════════════════
+async function createPiPayment(amount, memo, metadata){
+  return new Promise((resolve,reject)=>{
+    Pi.createPayment({amount,memo,metadata},{
+      onReadyForServerApproval:async(paymentId)=>{
+        try{await api('POST','/api/payments/approve',{paymentId,metadata});}catch(e){reject(e);}
+      },
+      onReadyForServerCompletion:async(paymentId,txid)=>{
+        try{await api('POST','/api/payments/complete',{paymentId,txid});resolve(txid);}catch(e){reject(e);}
+      },
+      onCancel:()=>reject(new Error('Cancelled')),
+      onError:(e)=>reject(e)
+    });
+  });
+}
+
+// ══════════════════════════════════════════════
+// MY TASKS
+// ══════════════════════════════════════════════
+function renderMyTasks(){
   const mine=tasks.filter(t=>t.claimed);
-  const rows=[
-    {rank:1,name:"Pioneer_4821",earned:142.5,done:38,cls:'gold-row'},
-    {rank:2,name:"Pioneer_7742",earned:98.0,done:21,cls:'silver-row'},
-    {rank:3,name:"Pioneer_0193",earned:87.5,done:19,cls:'bronze-row'},
-    {rank:4,name:currentUser?.username||'You',earned:mine.reduce((a,t)=>a+t.bounty,0),done:mine.length,cls:'you-row',isYou:true},
-    {rank:5,name:"Pioneer_3310",earned:41.0,done:12,cls:''},
-  ];
-  document.getElementById('lb-list').innerHTML=rows.map(r=>`<div class="lb-row ${r.cls}"><div class="lb-rank">${r.rank}</div><div class="lb-info"><div class="lb-name">${r.name}${r.isYou?' (you)':''}</div><div class="lb-tasks">${r.done} tasks completed</div></div><div class="lb-earned">π ${r.earned.toFixed(1)}</div></div>`).join('');
+  document.getElementById('mine-badge').textContent='('+mine.length+')';
+  const wrap=document.getElementById('mine-wrap');
+  if(!mine.length){
+    wrap.innerHTML=`<div style="text-align:center;padding:72px 0">
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:56px;color:var(--border2);margin-bottom:10px">⬡</div>
+      <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);margin-bottom:18px">No claimed tasks yet.</div>
+      <button class="btn btn-gold" onclick="switchAppTab('browse',document.querySelectorAll('.app-tab')[0])">Browse Tasks →</button>
+    </div>`;
+    document.getElementById('earn-sum').style.display='none'; return;
+  }
+  wrap.innerHTML=mine.map(t=>`
+    <div class="mtask">
+      <div class="mtask-top">
+        <span style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--muted);letter-spacing:2px">${t.category.toUpperCase()}</span>
+        <span class="schip">✓ IN PROGRESS</span>
+      </div>
+      <div class="mtask-title">${t.title}</div>
+      <div class="mtask-foot">
+        <span class="tbadge ${tcls(t.deadline)}">⏱ ${cd(t.deadline)}</span>
+        <div style="display:flex;align-items:center;gap:12px">
+          <span style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--gold)">π ${(t.bounty||0).toFixed(1)}</span>
+          <button class="submit-btn" onclick="openSubmitModal('${t._id}','${t.title.replace(/'/g,"\\'")}')">Submit Work →</button>
+        </div>
+      </div>
+    </div>`).join('');
+  const total=mine.reduce((a,t)=>a+(t.bounty||0),0);
+  document.getElementById('es-pi').textContent='π '+total.toFixed(1);
+  document.getElementById('es-cnt').textContent=mine.length;
+  document.getElementById('es-done').textContent=mine.filter(t=>t.status==='completed').length;
+  document.getElementById('earn-sum').style.display='grid';
 }
 
-// ── Render All ────────────────────────────────────────────────────────────────
-function renderAll(newIds=new Set()){renderFilters();renderGrid(newIds);renderMyTasks();renderLeaderboard();}
+// ══════════════════════════════════════════════
+// SUBMIT WORK
+// ══════════════════════════════════════════════
+function openSubmitModal(id, title){
+  submitId=id;
+  document.getElementById('sw-task').textContent='Task: '+title;
+  document.getElementById('sw-link').value='';
+  document.getElementById('sw-desc').value='';
+  document.getElementById('sw-err').style.display='none';
+  document.getElementById('sw-ok').style.display='none';
+  openModal('m-submit');
+}
 
-// ── Live feed simulation ──────────────────────────────────────────────────────
-const liveFeed=[
-  {title:"Proofread 500-word English article",cat:"Writing",bounty:1.5,skills:["English","Proofreading"]},
-  {title:"Record 10 voice samples in Hindi",cat:"Data",bounty:4.0,skills:["Hindi","Voice"]},
-  {title:"Test Pi payment flow on Android",cat:"Testing",bounty:3.0,skills:["Android","Pi Browser"]},
-  {title:"Create 3 social media graphics",cat:"Design",bounty:7.0,skills:["Canva","Design"]},
+async function submitWork(){
+  const desc=document.getElementById('sw-desc').value.trim();
+  const link=document.getElementById('sw-link').value.trim();
+  const err=document.getElementById('sw-err');
+  const ok=document.getElementById('sw-ok');
+  const btn=document.getElementById('sw-btn');
+  err.style.display='none'; ok.style.display='none';
+  if(!desc){err.textContent='⚠ Please describe your work.';err.style.display='block';return;}
+  btn.innerHTML='<span class="loader"></span>'; btn.disabled=true;
+  try {
+    await api('POST','/api/submissions',{taskId:submitId,workLink:link,description:desc});
+    ok.textContent='✓ Submitted! Waiting for poster approval.';
+    ok.style.display='block';
+    logActivity('Submitted work',null);
+    toast('Work submitted!','s');
+    setTimeout(()=>closeModal('m-submit'),2000);
+  }catch(e){
+    err.textContent='⚠ '+(e.message||'Submit failed'); err.style.display='block';
+  }
+  btn.innerHTML='Submit for Review →'; btn.disabled=false;
+}
+
+// ══════════════════════════════════════════════
+// LEADERBOARD
+// ══════════════════════════════════════════════
+function renderLeaderboard(users){
+  const mine=tasks.filter(t=>t.claimed);
+  const myEarned=mine.reduce((a,t)=>a+(t.bounty||0),0);
+  const myName=currentUser?.displayName||'You';
+  const myTrust=Math.min(100,(mine.length*8)+(currentUser?.trustScore||0));
+
+  // Merge DB users with current user
+  const rows = [];
+  if(users && users.length){
+    users.slice(0,4).forEach((u,i)=>{
+      rows.push({rank:i+1,name:u.displayName||u.piUsername,earned:u.piEarned||0,done:u.tasksCompleted||0,trust:u.trustScore||0,isYou:false});
+    });
+  } else {
+    rows.push({rank:1,name:'Pioneer_4821',earned:142.5,done:38,trust:94,isYou:false});
+    rows.push({rank:2,name:'Pioneer_7742',earned:98.0,done:21,trust:87,isYou:false});
+    rows.push({rank:3,name:'Pioneer_0193',earned:87.5,done:19,trust:82,isYou:false});
+  }
+  rows.push({rank:rows.length+1,name:myName,earned:myEarned,done:mine.length,trust:myTrust,isYou:true});
+  rows.push({rank:rows.length+1,name:'Pioneer_3310',earned:41.0,done:12,trust:65,isYou:false});
+
+  const clsMap=['lb-gld','lb-slv','lb-brz','','',''];
+  document.getElementById('lb-wrap').innerHTML=rows.map((r,i)=>`
+    <div class="lbrow ${r.isYou?'lb-you':clsMap[i]||''}">
+      <div class="lb-rank">${r.rank}</div>
+      <div class="lb-info">
+        <div class="lb-name">${r.name}${r.isYou?' (you)':''}</div>
+        <div class="lb-meta">${r.done} tasks · Trust ${r.trust}</div>
+      </div>
+      <div style="text-align:right">
+        <div class="lb-earn">π ${r.earned.toFixed(1)}</div>
+        <div class="lb-trust">Score: ${r.trust}/100</div>
+      </div>
+    </div>`).join('');
+}
+
+// ══════════════════════════════════════════════
+// PROFILE
+// ══════════════════════════════════════════════
+function logActivity(text,pi){
+  actLog.unshift({text,pi,time:new Date().toLocaleTimeString()});
+  if(actLog.length>20) actLog.pop();
+}
+
+function renderProfile(){
+  const mine=tasks.filter(t=>t.claimed);
+  const earned=mine.reduce((a,t)=>a+(t.bounty||0),0);
+  const trust=Math.min(100,(mine.length*8)+(actLog.length*2)+(currentUser?.trustScore||0));
+  document.getElementById('ps-claimed').textContent=mine.length;
+  document.getElementById('ps-done').textContent=mine.filter(t=>t.status==='completed').length;
+  document.getElementById('ps-posted').textContent=tasks.filter(t=>t.posterId===currentUser?.id).length;
+  document.getElementById('ps-earn').textContent=earned.toFixed(1);
+  document.getElementById('p-trust-lbl').textContent=trust+' / 100';
+  document.getElementById('p-trust-fill').style.width=trust+'%';
+  const wrap=document.getElementById('act-list');
+  if(!actLog.length){wrap.innerHTML='<div style="font-family:\'JetBrains Mono\',monospace;font-size:11px;color:var(--muted);padding:16px 0;text-align:center">No activity yet.</div>';return;}
+  wrap.innerHTML=actLog.map(a=>`
+    <div class="act-item">
+      <div><div class="act-text">${a.text}</div><div class="act-time">${a.time}</div></div>
+      ${a.pi?`<div class="act-earn">π ${a.pi.toFixed(1)}</div>`:''}
+    </div>`).join('');
+}
+
+// ══════════════════════════════════════════════
+// LIVE FEED
+// ══════════════════════════════════════════════
+const LIVE_FEED=[
+  {title:'Proofread 500-word English article',category:'Writing',bounty:1.5,skills:['English']},
+  {title:'Record 10 Hindi voice samples',category:'Data',bounty:4.0,skills:['Hindi']},
+  {title:'Test Pi payment on Android',category:'Testing',bounty:3.0,skills:['Android']},
+  {title:'Create 3 social media graphics',category:'Design',bounty:7.0,skills:['Canva']},
 ];
-let feedIdx=0;
+let fIdx=0;
 setInterval(()=>{
-  if(feedIdx>=liveFeed.length)return;
-  const t=liveFeed[feedIdx++];
-  const nt={id:Date.now()+feedIdx,...t,poster:'Pioneer_'+Math.floor(Math.random()*9999),desc:'Live task posted to The Arena. Claim it before slots fill up.',claims:0,max:Math.ceil(Math.random()*3),deadline:Date.now()+1000*60*(30+Math.floor(Math.random()*90)),claimed:false,hot:Math.random()>0.5};
-  tasks.unshift(nt);
-  document.getElementById('stat-live').textContent=tasks.filter(x=>x.claims<x.max).length;
-  document.getElementById('stat-total').textContent=tasks.length;
-  renderAll(new Set([nt.id]));
-},10000);
+  if(fIdx>=LIVE_FEED.length) return;
+  const f=LIVE_FEED[fIdx++];
+  const nt={
+    _id:'live-'+Date.now(), ...f,
+    posterName:'Pioneer_'+Math.floor(Math.random()*9999),
+    description:'Live task on The Arena. Claim before slots fill.',
+    claimsCount:0, maxClaims:Math.ceil(Math.random()*3),
+    deadline:new Date(Date.now()+1000*60*(30+Math.floor(Math.random()*90))).toISOString(),
+    claimed:false, hot:Math.random()>0.5
+  };
+  if(document.getElementById('pg-app').style.display!=='none'){
+    tasks.unshift(nt); renderGrid(new Set([nt._id]));
+    updateDashStats();
+    toast('New task: '+nt.title.substring(0,28)+'...','s');
+  }
+},12000);
 
-setInterval(()=>renderGrid(),30000);
+setInterval(()=>{
+  if(document.getElementById('pg-app').style.display!=='none') renderGrid();
+},30000);
 
-document.getElementById('post-modal').addEventListener('click',function(e){if(e.target===this)closePostModal();});
-document.getElementById('detail-modal').addEventListener('click',function(e){if(e.target===this)closeDetailModal();});
-
-renderAll();
+// ══════════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════════
+window.addEventListener('load',()=>{
+  if(token && currentUser){
+    enterApp();
+  } else {
+    showPage('pg-landing');
+  }
+});
 </script>
 </body>
 </html>
