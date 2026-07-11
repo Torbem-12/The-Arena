@@ -1,0 +1,1548 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta name="description" content="Arena — Pi Network Micro-Task Marketplace"/>
+<title>Arena — Pi Task Marketplace</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<script src="https://sdk.minepi.com/pi-sdk.js"></script>
+<style>
+:root{
+  --bg:#F8FAFC;--bg2:#F1F5F9;--surface:#FFFFFF;
+  --border:#E2E8F0;--border2:#CBD5E1;
+  --gold:#F4AF00;--gold-dark:#D99A00;--gold-bg:rgba(244,175,0,0.08);--gold-border:rgba(244,175,0,0.25);
+  --text:#0F172A;--text2:#475569;--text3:#94A3B8;
+  --green:#10B981;--green-bg:#ECFDF5;--green-text:#065F46;
+  --red:#EF4444;--red-bg:#FEF2F2;--red-text:#B91C1C;
+  --amber:#F59E0B;--amber-bg:#FFFBEB;--amber-text:#92400E;
+  --shadow-sm:0 1px 3px rgba(0,0,0,0.08);
+  --shadow:0 4px 6px -1px rgba(0,0,0,0.07);
+  --shadow-lg:0 16px 32px -8px rgba(0,0,0,0.1);
+  --shadow-xl:0 24px 48px -12px rgba(0,0,0,0.14);
+  --radius-sm:8px;--radius:12px;--radius-lg:16px;--radius-xl:20px;--radius-2xl:24px;
+  --font:"Inter",system-ui,sans-serif;
+}
+[data-theme="dark"]{
+  --bg:#0B1120;--bg2:#111827;--surface:#1A2235;
+  --border:#1E2D40;--border2:#2A3A50;
+  --text:#F1F5F9;--text2:#94A3B8;--text3:#4B5E78;
+  --green:#34D399;--green-bg:rgba(16,185,129,0.1);--green-text:#34D399;
+  --red:#F87171;--red-bg:rgba(239,68,68,0.1);--red-text:#F87171;
+  --amber:#FCD34D;--amber-bg:rgba(245,158,11,0.1);--amber-text:#FCD34D;
+  --shadow-sm:0 1px 3px rgba(0,0,0,0.4);
+  --shadow:0 4px 6px -1px rgba(0,0,0,0.4);
+  --shadow-lg:0 16px 32px -8px rgba(0,0,0,0.6);
+  --shadow-xl:0 24px 48px -12px rgba(0,0,0,0.7);
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:15px;line-height:1.6;min-height:100vh;overflow-x:hidden;-webkit-font-smoothing:antialiased;}
+::-webkit-scrollbar{width:4px;}::-webkit-scrollbar-thumb{background:var(--border2);border-radius:4px;}
+img{display:block;max-width:100%;}
+button,input,select,textarea{font-family:var(--font);}
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes scaleIn{from{opacity:0;transform:scale(0.96)}to{opacity:1;transform:scale(1)}}
+@keyframes slideDown{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+@keyframes shimmer{0%{background-position:-400px 0}100%{background-position:400px 0}}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+.fade-up{animation:fadeUp 0.5s ease both;}
+.delay-1{animation-delay:.1s;}.delay-2{animation-delay:.2s;}.delay-3{animation-delay:.3s;}
+/* SKELETON */
+.skeleton{background:linear-gradient(90deg,var(--border) 25%,var(--bg2) 50%,var(--border) 75%);background-size:400px 100%;animation:shimmer 1.4s infinite;border-radius:var(--radius-sm);}
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;border:none;cursor:pointer;font-size:14px;font-weight:600;letter-spacing:-0.01em;border-radius:var(--radius-sm);transition:all 0.2s ease;white-space:nowrap;padding:10px 18px;outline:none;user-select:none;}
+.btn:focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
+.btn:disabled{opacity:0.5;cursor:not-allowed;pointer-events:none;}
+.btn-primary{background:var(--gold);color:#0F172A;box-shadow:0 1px 2px rgba(244,175,0,0.25);}
+.btn-primary:hover{background:var(--gold-dark);box-shadow:0 4px 14px rgba(244,175,0,0.45);transform:translateY(-1px);}
+.btn-primary:active{transform:translateY(0);}
+.btn-secondary{background:var(--surface);color:var(--text);border:1px solid var(--border);box-shadow:var(--shadow-sm);}
+.btn-secondary:hover{background:var(--bg2);border-color:var(--border2);}
+.btn-ghost{background:transparent;color:var(--text2);border:1px solid transparent;}
+.btn-ghost:hover{background:var(--bg2);color:var(--text);}
+.btn-danger{background:var(--red-bg);color:var(--red-text);border:1px solid rgba(239,68,68,0.2);}
+.btn-danger:hover{background:var(--red);color:white;}
+.btn-sm{padding:7px 14px;font-size:13px;border-radius:6px;}
+.btn-lg{padding:13px 28px;font-size:15px;border-radius:var(--radius);}
+.btn-xl{padding:16px 36px;font-size:16px;border-radius:var(--radius-lg);}
+.btn-full{width:100%;padding:13px 18px;}
+.btn-icon{padding:9px;width:38px;height:38px;border-radius:var(--radius-sm);}
+.loader{width:15px;height:15px;flex-shrink:0;border:2px solid rgba(0,0,0,0.1);border-top-color:currentColor;border-radius:50%;animation:spin 0.65s linear infinite;}
+[data-theme="dark"] .loader{border-color:rgba(255,255,255,0.1);border-top-color:currentColor;}
+/* PI BUTTON */
+.btn-pi{background:linear-gradient(135deg,#F4AF00,#D99A00);color:#0F172A;border:none;width:100%;padding:14px 20px;border-radius:var(--radius-sm);font-size:15px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:12px;transition:all 0.2s;box-shadow:0 2px 8px rgba(244,175,0,0.35);}
+.btn-pi:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(244,175,0,0.5);}
+.pi-sym{width:24px;height:24px;background:#0F172A;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:900;color:var(--gold);flex-shrink:0;}
+/* FORMS */
+.fgroup{margin-bottom:18px;}
+.flabel{display:block;font-size:13px;font-weight:500;color:var(--text);margin-bottom:7px;}
+.finput,.fselect,.ftextarea{width:100%;background:var(--surface);border:1.5px solid var(--border);color:var(--text);padding:11px 14px;font-size:14px;border-radius:var(--radius-sm);outline:none;transition:border-color 0.2s,box-shadow 0.2s;box-shadow:var(--shadow-sm);}
+.finput::placeholder,.ftextarea::placeholder{color:var(--text3);}
+.finput:focus,.fselect:focus,.ftextarea:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(244,175,0,0.15);}
+.ftextarea{min-height:90px;resize:vertical;line-height:1.6;}
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.ferror{display:none;background:var(--red-bg);border:1px solid rgba(239,68,68,0.2);padding:11px 14px;margin-bottom:14px;font-size:13px;color:var(--red-text);border-radius:var(--radius-sm);}
+.fsuccess{display:none;background:var(--green-bg);border:1px solid rgba(16,185,129,0.2);padding:11px 14px;margin-bottom:14px;font-size:13px;color:var(--green-text);border-radius:var(--radius-sm);}
+/* BADGES */
+.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:20px;font-size:11.5px;font-weight:600;}
+.badge-gold{background:var(--gold-bg);color:#8B6500;border:1px solid var(--gold-border);}
+.badge-green{background:var(--green-bg);color:var(--green-text);}
+.badge-red{background:var(--red-bg);color:var(--red-text);}
+.badge-amber{background:var(--amber-bg);color:var(--amber-text);}
+.badge-gray{background:var(--bg2);color:var(--text2);border:1px solid var(--border);}
+[data-theme="dark"] .badge-gold{color:var(--gold);}
+[data-theme="dark"] .badge-amber{color:var(--amber);}
+/* MODALS */
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.55);backdrop-filter:blur(6px);z-index:900;align-items:center;justify-content:center;padding:16px;}
+.overlay.open{display:flex;animation:fadeIn 0.2s ease;}
+.modal{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-2xl);width:100%;max-width:520px;max-height:92vh;overflow-y:auto;padding:28px;box-shadow:var(--shadow-xl);animation:scaleIn 0.22s ease;}
+.modal-hd{display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;}
+.modal-title{font-size:18px;font-weight:700;color:var(--text);letter-spacing:-0.02em;}
+.modal-x{background:var(--bg2);border:1px solid var(--border);color:var(--text2);cursor:pointer;width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;transition:all 0.15s;font-size:16px;}
+.modal-x:hover{background:var(--border);color:var(--text);}
+/* TOAST */
+#toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(24px);padding:12px 20px;font-size:14px;font-weight:500;z-index:9999;opacity:0;transition:all 0.28s cubic-bezier(0.34,1.56,0.64,1);pointer-events:none;border-radius:var(--radius);box-shadow:var(--shadow-xl);display:flex;align-items:center;gap:10px;max-width:90vw;}
+#toast.visible{opacity:1;transform:translateX(-50%) translateY(0);}
+#toast.t-s{background:#0F172A;color:#F4AF00;}
+#toast.t-e{background:#7F1D1D;color:#FCA5A5;}
+#toast.t-w{background:#1C1500;color:#FCD34D;}
+[data-theme="dark"] #toast.t-s{background:var(--surface);border:1px solid var(--border2);}
+/* LOADING */
+#loading-screen{position:fixed;inset:0;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9000;transition:opacity 0.4s ease;}
+#loading-screen.hide{opacity:0;pointer-events:none;}
+.loading-logo{animation:float 2.5s ease infinite;}
+.loading-bar{width:120px;height:3px;background:var(--border);border-radius:2px;margin-top:14px;overflow:hidden;}
+.loading-fill{height:100%;border-radius:2px;background:linear-gradient(90deg,var(--border) 25%,var(--gold) 50%,var(--border) 75%);background-size:240px 100%;animation:shimmer 1.4s infinite;}
+.loading-text{font-size:12px;font-weight:700;color:var(--text3);letter-spacing:0.1em;text-transform:uppercase;margin-top:12px;}
+/* NOT-PI BANNER */
+#not-pi-banner{display:none;background:var(--amber-bg);border-bottom:1px solid rgba(245,158,11,0.2);padding:9px 20px;text-align:center;font-size:13px;font-weight:500;color:var(--amber-text);}
+[data-theme="dark"] #not-pi-banner{color:var(--amber);}
+/* PAGES */
+.page{display:none;flex-direction:column;min-height:100vh;}
+.page.active{display:flex;animation:fadeIn 0.3s ease;}
+/* LOGO */
+.arena-logo{display:flex;align-items:center;gap:10px;cursor:pointer;text-decoration:none;}
+.arena-logo img{object-fit:contain;}
+.arena-logo-text{font-size:18px;font-weight:900;color:var(--text);letter-spacing:-0.04em;}
+/* LANDING NAV */
+.land-nav{position:sticky;top:0;z-index:100;background:rgba(248,250,252,0.9);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:0 28px;height:68px;display:flex;align-items:center;justify-content:space-between;}
+[data-theme="dark"] .land-nav{background:rgba(11,17,32,0.92);}
+.nav-links{display:flex;align-items:center;gap:8px;}
+.nav-link{font-size:14px;font-weight:500;color:var(--text2);padding:7px 12px;border-radius:var(--radius-sm);transition:all 0.15s;text-decoration:none;}
+.nav-link:hover{color:var(--text);background:var(--bg2);}
+.theme-btn{background:var(--bg2);border:1px solid var(--border);color:var(--text2);cursor:pointer;width:38px;height:38px;border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;font-size:16px;transition:all 0.15s;}
+.theme-btn:hover{background:var(--border);}
+/* HERO */
+.hero{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:80px 24px 64px;position:relative;overflow:hidden;}
+.hero-bg{position:absolute;inset:0;pointer-events:none;}
+.hero-glow{position:absolute;top:-20%;left:50%;transform:translateX(-50%);width:700px;height:700px;border-radius:50%;background:radial-gradient(circle,rgba(244,175,0,0.07) 0%,transparent 65%);}
+.hero-grid{position:absolute;inset:0;background-image:linear-gradient(var(--border) 1px,transparent 1px),linear-gradient(90deg,var(--border) 1px,transparent 1px);background-size:48px 48px;opacity:0.4;}
+[data-theme="dark"] .hero-grid{opacity:0.12;}
+.hero-badge{display:inline-flex;align-items:center;gap:8px;background:var(--gold-bg);border:1px solid var(--gold-border);color:#8B6500;padding:7px 18px;border-radius:24px;font-size:12px;font-weight:700;letter-spacing:0.04em;text-transform:uppercase;margin-bottom:28px;animation:fadeUp 0.5s ease;}
+[data-theme="dark"] .hero-badge{color:var(--gold);}
+.hero-logo{margin-bottom:32px;animation:fadeUp 0.5s ease 0.1s both;filter:drop-shadow(0 12px 32px rgba(244,175,0,0.22));}
+.hero-h1{font-size:clamp(44px,7.5vw,80px);font-weight:900;color:var(--text);letter-spacing:-0.05em;line-height:1.02;margin-bottom:20px;animation:fadeUp 0.5s ease 0.15s both;}
+.hero-h1 em{font-style:normal;background:linear-gradient(135deg,#F4AF00,#FF8C00);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.hero-sub{font-size:clamp(16px,2vw,19px);color:var(--text2);max-width:540px;line-height:1.7;margin-bottom:44px;animation:fadeUp 0.5s ease 0.2s both;}
+.hero-btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-bottom:64px;animation:fadeUp 0.5s ease 0.25s both;}
+.hero-stats{display:inline-flex;border:1px solid var(--border);border-radius:var(--radius-xl);background:var(--surface);box-shadow:var(--shadow-lg);overflow:hidden;animation:fadeUp 0.5s ease 0.3s both;}
+.hstat{padding:20px 36px;text-align:center;border-right:1px solid var(--border);}
+.hstat:last-child{border-right:none;}
+.hstat-val{font-size:28px;font-weight:900;color:var(--text);letter-spacing:-0.05em;line-height:1;}
+.hstat-val .pi{color:var(--gold);}
+.hstat-key{font-size:12px;color:var(--text3);font-weight:500;margin-top:4px;}
+/* FEATURES */
+.lsec{padding:88px 24px;}
+.lsec-inner{max-width:1120px;margin:0 auto;}
+.lsec-tag{font-size:12px;font-weight:700;color:var(--gold);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:14px;}
+.lsec-h2{font-size:clamp(28px,4vw,44px);font-weight:800;color:var(--text);letter-spacing:-0.03em;margin-bottom:14px;line-height:1.1;}
+.lsec-sub{font-size:16px;color:var(--text2);max-width:460px;line-height:1.65;margin-bottom:52px;}
+.feat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:20px;}
+.feat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-xl);padding:28px;transition:all 0.2s;}
+.feat-card:hover{box-shadow:var(--shadow-lg);border-color:var(--gold-border);transform:translateY(-3px);}
+.feat-icon{width:52px;height:52px;border-radius:var(--radius);background:var(--gold-bg);border:1px solid var(--gold-border);display:flex;align-items:center;justify-content:center;font-size:24px;margin-bottom:18px;}
+.feat-name{font-size:16px;font-weight:700;color:var(--text);margin-bottom:9px;letter-spacing:-0.01em;}
+.feat-desc{font-size:14px;color:var(--text2);line-height:1.65;}
+.steps-wrap{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:1px;background:var(--border);border:1px solid var(--border);border-radius:var(--radius-xl);overflow:hidden;}
+.step-card{background:var(--surface);padding:28px 22px;}
+.step-num{font-size:44px;font-weight:900;color:var(--border2);line-height:1;margin-bottom:14px;letter-spacing:-0.06em;}
+.step-title{font-size:15px;font-weight:700;color:var(--text);margin-bottom:8px;}
+.step-desc{font-size:13px;color:var(--text2);line-height:1.65;}
+.land-cta{background:var(--text);padding:88px 24px;text-align:center;position:relative;overflow:hidden;}
+[data-theme="dark"] .land-cta{background:var(--surface);}
+.cta-glow{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:600px;height:400px;background:radial-gradient(ellipse,rgba(244,175,0,0.12) 0%,transparent 70%);pointer-events:none;}
+.cta-h2{font-size:clamp(30px,5vw,52px);font-weight:900;color:white;letter-spacing:-0.04em;margin-bottom:14px;}
+[data-theme="dark"] .cta-h2{color:var(--text);}
+.cta-sub{font-size:16px;color:rgba(255,255,255,0.55);margin-bottom:36px;}
+[data-theme="dark"] .cta-sub{color:var(--text2);}
+.cta-url-box{display:inline-block;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);padding:12px 28px;border-radius:var(--radius);margin-bottom:32px;}
+[data-theme="dark"] .cta-url-box{background:var(--bg2);border-color:var(--border);}
+.cta-url{font-family:monospace;font-size:14px;color:var(--gold);}
+.land-footer{padding:20px 24px;border-top:1px solid var(--border);text-align:center;background:var(--surface);}
+.land-footer span{font-size:13px;color:var(--text3);}
+/* AUTH */
+#pg-auth{background:var(--bg);align-items:center;justify-content:center;padding:24px;}
+.auth-wrap{width:100%;max-width:420px;animation:fadeUp 0.4s ease;}
+.auth-logo-section{display:flex;flex-direction:column;align-items:center;margin-bottom:28px;}
+.auth-logo-section .brand{font-size:24px;font-weight:900;color:var(--text);letter-spacing:-0.04em;margin-top:12px;}
+.auth-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-2xl);padding:32px;box-shadow:var(--shadow-xl);}
+.auth-tabs{display:flex;background:var(--bg2);border-radius:var(--radius-sm);padding:3px;margin-bottom:24px;gap:3px;}
+.auth-tab{flex:1;background:transparent;border:none;color:var(--text3);padding:9px 16px;font-size:14px;font-weight:500;cursor:pointer;border-radius:6px;transition:all 0.15s;}
+.auth-tab.active{background:var(--surface);color:var(--text);box-shadow:var(--shadow-sm);font-weight:600;}
+.auth-divider{display:flex;align-items:center;gap:12px;margin:18px 0;}
+.auth-divider span{font-size:13px;color:var(--text3);}
+.auth-divider::before,.auth-divider::after{content:"";flex:1;height:1px;background:var(--border);}
+.auth-note{font-size:13px;color:var(--text3);text-align:center;margin-top:18px;line-height:1.6;}
+.auth-link{color:var(--gold);cursor:pointer;font-weight:500;}
+.auth-link:hover{text-decoration:underline;}
+/* APP HEADER */
+.app-hdr{position:sticky;top:0;z-index:200;background:rgba(248,250,252,0.92);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:0 20px;height:62px;display:flex;align-items:center;justify-content:space-between;box-shadow:var(--shadow-sm);}
+[data-theme="dark"] .app-hdr{background:rgba(11,17,32,0.94);}
+.hdr-left{display:flex;align-items:center;gap:14px;}
+.hdr-right{display:flex;align-items:center;gap:8px;}
+.live-pill{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:var(--green);padding:5px 10px;border-radius:20px;background:var(--green-bg);border:1px solid rgba(16,185,129,0.2);}
+.live-dot{width:6px;height:6px;border-radius:50%;background:var(--green);animation:pulse 2s infinite;flex-shrink:0;}
+.user-menu{display:flex;align-items:center;gap:9px;padding:6px 12px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--surface);cursor:pointer;transition:all 0.15s;box-shadow:var(--shadow-sm);}
+.user-menu:hover{border-color:var(--border2);}
+.user-av{width:28px;height:28px;background:linear-gradient(135deg,var(--gold),#E09800);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#0F172A;flex-shrink:0;}
+.user-nm{font-size:13px;font-weight:600;color:var(--text);}
+/* DASHBOARD */
+.dash-wrap{background:var(--surface);border-bottom:1px solid var(--border);padding:22px 20px;}
+.dash-inner{max-width:1200px;margin:0 auto;}
+.dash-greeting{font-size:22px;font-weight:800;color:var(--text);margin-bottom:18px;letter-spacing:-0.03em;}
+.dash-greeting .name{color:var(--gold);}
+.dash-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px;}
+.dstat{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:16px 18px;}
+.dstat-val{font-size:26px;font-weight:900;color:var(--text);letter-spacing:-0.04em;line-height:1;margin-bottom:5px;}
+.dstat-key{font-size:12px;font-weight:500;color:var(--text3);}
+.dash-actions{display:flex;gap:8px;flex-wrap:wrap;}
+/* SEARCH */
+.search-wrap{padding:12px 20px;background:var(--bg);border-bottom:1px solid var(--border);}
+.search-inner{max-width:1200px;margin:0 auto;display:flex;gap:10px;}
+.search-box{flex:1;display:flex;align-items:center;gap:10px;background:var(--surface);border:1.5px solid var(--border);padding:10px 15px;border-radius:var(--radius-sm);transition:border-color 0.2s,box-shadow 0.2s;box-shadow:var(--shadow-sm);}
+.search-box:focus-within{border-color:var(--gold);box-shadow:0 0 0 3px rgba(244,175,0,0.12);}
+.search-box input{flex:1;background:none;border:none;color:var(--text);font-size:14px;outline:none;}
+.search-box input::placeholder{color:var(--text3);}
+.search-ico{color:var(--text3);font-size:16px;flex-shrink:0;}
+.sort-sel{background:var(--surface);border:1.5px solid var(--border);color:var(--text);padding:10px 14px;font-size:13px;border-radius:var(--radius-sm);outline:none;cursor:pointer;box-shadow:var(--shadow-sm);min-width:150px;}
+.sort-sel:focus{border-color:var(--gold);}
+/* TABS */
+.tabs-bar{background:var(--bg);border-bottom:1px solid var(--border);padding:0 20px;display:flex;overflow-x:auto;}
+.tabs-bar::-webkit-scrollbar{height:0;}
+.tab-btn{background:none;border:none;border-bottom:2.5px solid transparent;color:var(--text3);padding:15px 18px;font-size:13.5px;font-weight:500;cursor:pointer;transition:all 0.15s;white-space:nowrap;flex-shrink:0;letter-spacing:-0.01em;}
+.tab-btn:hover:not(.active){color:var(--text2);}
+.tab-btn.active{color:var(--gold);border-bottom-color:var(--gold);font-weight:700;}
+.tab-count{background:var(--gold);color:#0F172A;padding:1px 6px;border-radius:10px;font-size:11px;font-weight:700;margin-left:5px;}
+/* MAIN */
+.app-main{flex:1;max-width:1200px;margin:0 auto;width:100%;padding:24px 20px;}
+.tsec{display:none;animation:fadeIn 0.3s ease;}
+.tsec.active{display:block;}
+/* FILTER BAR */
+.filter-bar{display:flex;gap:6px;margin-bottom:22px;flex-wrap:wrap;align-items:center;}
+.fchip{background:var(--surface);border:1.5px solid var(--border);color:var(--text2);padding:7px 15px;font-size:13px;font-weight:500;cursor:pointer;border-radius:24px;transition:all 0.15s;box-shadow:var(--shadow-sm);}
+.fchip:hover:not(.active){border-color:var(--border2);color:var(--text);}
+.fchip.active{background:var(--gold);border-color:var(--gold);color:#0F172A;font-weight:700;box-shadow:0 2px 8px rgba(244,175,0,0.3);}
+.res-count{margin-left:auto;font-size:13px;color:var(--text3);font-weight:500;}
+/* TASK GRID */
+.task-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:16px;}
+/* TASK CARD */
+.task-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-xl);padding:22px;cursor:pointer;transition:all 0.2s;position:relative;box-shadow:var(--shadow-sm);}
+.task-card:hover{box-shadow:var(--shadow-lg);border-color:var(--border2);transform:translateY(-3px);}
+.task-card.is-hot{border-top:3px solid var(--gold);}
+.task-card.is-new{animation:slideDown 0.35s ease;}
+.tc-tags{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-bottom:14px;}
+.tc-timer{display:inline-flex;align-items:center;gap:5px;padding:4px 9px;border-radius:8px;font-size:12px;font-weight:600;}
+.tc-safe{color:var(--green-text);background:var(--green-bg);}
+.tc-warn{color:var(--amber-text);background:var(--amber-bg);}
+.tc-urg{color:var(--red-text);background:var(--red-bg);}
+[data-theme="dark"] .tc-warn{color:var(--amber);}
+[data-theme="dark"] .tc-urg{color:var(--red);}
+.tc-body{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:14px;}
+.tc-title{font-size:15px;font-weight:700;color:var(--text);line-height:1.4;margin-bottom:5px;letter-spacing:-0.01em;}
+.tc-poster{font-size:12px;color:var(--text3);}
+.tc-poster b{color:var(--text2);font-weight:500;}
+.tc-bounty-val{font-size:28px;font-weight:900;color:var(--gold);line-height:1;letter-spacing:-0.04em;text-align:right;}
+.tc-bounty-key{font-size:11px;font-weight:600;color:var(--text3);margin-top:2px;letter-spacing:0.03em;text-align:right;}
+.tc-prog-row{display:flex;justify-content:space-between;margin-bottom:6px;}
+.tc-prog-row span{font-size:12px;color:var(--text3);}
+.tc-prog-track{height:4px;background:var(--border);border-radius:2px;overflow:hidden;margin-bottom:12px;}
+.tc-prog-fill{height:100%;border-radius:2px;transition:width 0.4s ease;}
+.tc-skills{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:14px;}
+.tc-skill{font-size:12px;color:var(--text2);background:var(--bg2);border:1px solid var(--border);padding:3px 9px;border-radius:6px;font-weight:500;}
+.claim-btn{width:100%;padding:11px;font-size:13px;font-weight:700;border-radius:var(--radius-sm);border:none;cursor:pointer;transition:all 0.15s;letter-spacing:-0.01em;}
+.cb-open{background:var(--gold);color:#0F172A;}
+.cb-open:hover{background:var(--gold-dark);box-shadow:0 4px 14px rgba(244,175,0,0.4);}
+.cb-claimed{background:var(--green-bg);color:var(--green-text);cursor:default;border:1px solid rgba(16,185,129,0.2);}
+.cb-full{background:var(--bg2);color:var(--text3);cursor:default;border:1px solid var(--border);}
+[data-theme="dark"] .cb-claimed{color:var(--green);}
+/* EMPTY STATE */
+.empty-state{grid-column:1/-1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:80px 24px;text-align:center;}
+.empty-icon{width:64px;height:64px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-lg);display:flex;align-items:center;justify-content:center;font-size:28px;margin:0 auto 18px;}
+.empty-title{font-size:16px;font-weight:700;color:var(--text2);margin-bottom:7px;}
+.empty-sub{font-size:14px;color:var(--text3);margin-bottom:22px;line-height:1.6;}
+/* DETAIL MODAL */
+.dstat-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:22px;}
+.dstat-cell{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px;text-align:center;}
+.dstat-val{font-size:20px;font-weight:800;letter-spacing:-0.03em;line-height:1;}
+.dstat-key{font-size:11px;font-weight:500;color:var(--text3);margin-top:4px;letter-spacing:0.02em;}
+.task-desc-text{font-size:14px;color:var(--text2);line-height:1.75;margin-bottom:22px;}
+.how-box{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:18px;margin-bottom:22px;}
+.how-label{font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;}
+.how-step{display:flex;gap:12px;align-items:flex-start;padding:5px 0;}
+.how-step-n{width:22px;height:22px;background:var(--gold);color:#0F172A;border-radius:50%;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;}
+.how-step-t{font-size:13px;color:var(--text2);line-height:1.55;}
+/* PAY SUMMARY */
+.pay-box{background:var(--gold-bg);border:1px solid var(--gold-border);border-radius:var(--radius-sm);padding:16px;margin-bottom:20px;}
+.pay-box-label{font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:10px;}
+.pay-box-row{display:flex;justify-content:space-between;align-items:center;}
+.pay-box-sub{font-size:12px;color:var(--text3);margin-top:7px;line-height:1.6;}
+.pay-big{font-size:28px;font-weight:900;color:var(--gold);letter-spacing:-0.04em;}
+/* MY TASKS */
+.my-task-card{background:var(--surface);border:1px solid var(--border);border-left:4px solid var(--green);border-radius:var(--radius-xl);padding:20px 22px;margin-bottom:12px;box-shadow:var(--shadow-sm);}
+.mt-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
+.mt-title{font-size:15px;font-weight:700;color:var(--text);margin-bottom:12px;letter-spacing:-0.01em;}
+.mt-foot{display:flex;justify-content:space-between;align-items:center;}
+.submit-btn{background:var(--green-bg);color:var(--green-text);border:1px solid rgba(16,185,129,0.25);padding:8px 16px;border-radius:6px;font-size:13px;font-weight:600;cursor:pointer;transition:all 0.15s;}
+.submit-btn:hover{background:var(--green);color:white;}
+[data-theme="dark"] .submit-btn{color:var(--green);}
+.earn-sum{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-xl);padding:22px;margin-top:22px;display:grid;grid-template-columns:repeat(3,1fr);gap:20px;box-shadow:var(--shadow-sm);}
+.eblock-val{font-size:30px;font-weight:900;color:var(--gold);letter-spacing:-0.05em;line-height:1;}
+.eblock-key{font-size:12px;font-weight:500;color:var(--text3);margin-top:5px;}
+/* LEADERBOARD */
+.lb-row{display:flex;align-items:center;gap:16px;padding:14px 18px;margin-bottom:8px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);transition:all 0.15s;box-shadow:var(--shadow-sm);}
+.lb-row:hover{box-shadow:var(--shadow);border-color:var(--border2);}
+.lb-gold{border-left:4px solid var(--gold);}
+.lb-silver{border-left:4px solid #94A3B8;}
+.lb-bronze{border-left:4px solid #CD7F32;}
+.lb-you{border-left:4px solid var(--green);background:var(--green-bg);}
+.lb-rank{font-size:22px;font-weight:900;color:var(--text3);width:30px;text-align:center;flex-shrink:0;}
+.lb-gold .lb-rank{color:var(--gold);}
+.lb-info{flex:1;}
+.lb-name{font-size:14px;font-weight:700;color:var(--text);}
+.lb-you .lb-name{color:var(--green-text);}
+[data-theme="dark"] .lb-you .lb-name{color:var(--green);}
+.lb-meta{font-size:12px;color:var(--text3);margin-top:2px;}
+.lb-earn{font-size:20px;font-weight:900;color:var(--gold);letter-spacing:-0.03em;}
+/* PROFILE */
+.prof-layout{display:grid;grid-template-columns:300px 1fr;gap:20px;}
+.prof-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-xl);padding:26px;box-shadow:var(--shadow-sm);text-align:center;}
+.prof-av{width:76px;height:76px;background:linear-gradient(135deg,var(--gold),#E09800);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:30px;font-weight:900;color:#0F172A;margin:0 auto 16px;box-shadow:0 6px 20px rgba(244,175,0,0.35);}
+.prof-name{font-size:20px;font-weight:800;color:var(--text);margin-bottom:4px;letter-spacing:-0.03em;}
+.prof-handle{font-size:13px;color:var(--text3);margin-bottom:22px;}
+.prof-stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px;}
+.pstat{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:13px;}
+.pstat-val{font-size:22px;font-weight:900;color:var(--gold);letter-spacing:-0.04em;line-height:1;}
+.pstat-key{font-size:11px;font-weight:500;color:var(--text3);margin-top:4px;}
+.trust-wrap{margin-bottom:20px;}
+.trust-hdr{display:flex;justify-content:space-between;font-size:12px;font-weight:500;color:var(--text2);margin-bottom:7px;}
+.trust-track{height:6px;background:var(--border);border-radius:3px;overflow:hidden;}
+.trust-fill{height:100%;background:linear-gradient(90deg,var(--gold),#E09800);border-radius:3px;transition:width 0.6s ease;}
+.prof-actions{display:flex;flex-direction:column;gap:8px;}
+.prof-activity{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-xl);padding:24px;box-shadow:var(--shadow-sm);}
+.act-title{font-size:16px;font-weight:700;color:var(--text);margin-bottom:16px;letter-spacing:-0.01em;}
+.act-item{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--border);}
+.act-item:last-child{border-bottom:none;}
+.act-ico{width:38px;height:38px;border-radius:10px;background:var(--gold-bg);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
+.act-info{flex:1;}
+.act-text{font-size:14px;font-weight:500;color:var(--text);line-height:1.4;}
+.act-time{font-size:12px;color:var(--text3);margin-top:2px;}
+.act-amount{font-size:16px;font-weight:700;color:var(--gold);}
+.sec-label{font-size:12px;font-weight:700;color:var(--text3);letter-spacing:0.06em;text-transform:uppercase;margin-bottom:18px;}
+.app-footer{border-top:1px solid var(--border);padding:14px 20px;text-align:center;background:var(--surface);}
+.app-footer span{font-size:12px;color:var(--text3);}
+@media(max-width:900px){.prof-layout{grid-template-columns:1fr;}.dash-grid{grid-template-columns:1fr 1fr;}}
+@media(max-width:640px){.task-grid{grid-template-columns:1fr;}.frow{grid-template-columns:1fr;}.dstat-row{grid-template-columns:1fr;}.hero-stats{flex-direction:column;border:none;}.hstat{border-right:none;border-bottom:1px solid var(--border);border-radius:0;}.hstat:last-child{border-bottom:none;}.earn-sum{grid-template-columns:1fr 1fr;}.land-nav,.app-hdr{padding-left:14px;padding-right:14px;}.app-main,.search-wrap,.dash-wrap{padding-left:14px;padding-right:14px;}.modal{padding:20px 16px;border-radius:var(--radius-xl);}.hero{padding:60px 16px 48px;}.hero-h1{font-size:40px;}.lsec{padding:56px 16px;}.land-cta{padding:64px 16px;}.steps-wrap{grid-template-columns:1fr 1fr;}}
+@media(max-width:400px){.earn-sum{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+<!-- LOADING SCREEN -->
+<div id="ls">
+  <div class="loading-logo">
+    <img src="https://torbem-12.github.io/The-Arena/logo.png" alt="Arena" style="width:110px;height:auto;" onerror="this.style.display='none';document.getElementById('ls-fb').style.display='flex'"/>
+    <div id="ls-fb" style="display:none;width:110px;height:110px;background:var(--gold-bg);border:2px solid var(--gold-border);border-radius:20px;align-items:center;justify-content:center;font-size:52px;font-weight:900;color:var(--gold);">A</div>
+  </div>
+  <div class="loading-text">Arena</div>
+  <div class="loading-bar"><div class="loading-fill"></div></div>
+</div>
+
+<!-- NOT PI BANNER -->
+<div id="not-pi-banner">⚠ Pi Browser not detected — Pi Wallet and payments require Pi Browser to function</div>
+
+<!-- TOAST -->
+<div id="toast" role="alert"></div>
+
+<!-- ══════════════════════════════════════
+     LANDING PAGE
+══════════════════════════════════════ -->
+<div id="pg-landing" class="page">
+  <nav class="land-nav">
+    <div class="arena-logo" onclick="showPage('pg-landing')">
+      <img src="https://torbem-12.github.io/The-Arena/logo.png" alt="Arena" style="height:48px;width:auto;" onerror="this.style.display='none';this.nextElementSibling.style.display='block'"/>
+      <div style="display:none;width:40px;height:40px;background:var(--gold-bg);border:1.5px solid var(--gold-border);border-radius:10px;align-items:center;justify-content:center;font-size:22px;font-weight:900;color:var(--gold);">A</div>
+      <span class="arena-logo-text">Arena</span>
+    </div>
+    <div class="nav-links">
+      <a href="#features" class="nav-link">Features</a>
+      <a href="#how-it-works" class="nav-link">How It Works</a>
+      <button class="theme-btn" onclick="toggleTheme()" id="theme-btn">🌙</button>
+      <button class="btn btn-ghost btn-sm" onclick="showAuth('signin')">Sign In</button>
+      <button class="btn btn-primary btn-sm" onclick="showAuth('signup')">Get Started →</button>
+    </div>
+  </nav>
+
+  <section class="hero">
+    <div class="hero-bg"><div class="hero-grid"></div><div class="hero-glow"></div></div>
+    <div class="hero-badge fade-up">⚡ Pi Network · Real Task Marketplace · 60M+ Pioneers</div>
+    <div class="hero-logo fade-up delay-1">
+      <img src="https://torbem-12.github.io/The-Arena/logo.png" alt="Arena"
+           style="width:clamp(110px,16vw,180px);height:auto;"
+           onerror="this.style.display='none'"/>
+    </div>
+    <h1 class="hero-h1">Earn <em>Pi</em> Doing<br>Real Work</h1>
+    <p class="hero-sub">The first real-time micro-task marketplace on Pi Network. Post tasks, complete work, and earn Pi — secured by escrow payments and verified identity.</p>
+    <div class="hero-btns">
+      <button class="btn btn-primary btn-xl" onclick="showAuth('signup')">Enter Arena →</button>
+      <button class="btn btn-secondary btn-xl" onclick="document.getElementById('features').scrollIntoView({behavior:'smooth'})">See How It Works</button>
+    </div>
+    <div class="hero-stats">
+      <div class="hstat"><div class="hstat-val" id="hs-live">—</div><div class="hstat-key">Live Tasks</div></div>
+      <div class="hstat"><div class="hstat-val"><span class="pi">π</span><span id="hs-pi">—</span></div><div class="hstat-key">In Bounties</div></div>
+      <div class="hstat"><div class="hstat-val" id="hs-users">—</div><div class="hstat-key">Pioneers</div></div>
+      <div class="hstat"><div class="hstat-val">100%</div><div class="hstat-key">Pi Payments</div></div>
+    </div>
+  </section>
+
+  <section class="lsec" id="features" style="background:var(--surface);border-top:1px solid var(--border);border-bottom:1px solid var(--border);">
+    <div class="lsec-inner">
+      <div class="lsec-tag">⭐ Why Arena</div>
+      <h2 class="lsec-h2">Built for the Pi Ecosystem</h2>
+      <p class="lsec-sub">Every feature designed around Pi Network — real payments, verified identity, real utility for real Pioneers.</p>
+      <div class="feat-grid">
+        <div class="feat-card"><div class="feat-icon">🛡️</div><div class="feat-name">Pi Authentication</div><div class="feat-desc">Every user is KYC-verified through Pi Network. No bots, no fake accounts — only real Pioneers building real trust.</div></div>
+        <div class="feat-card"><div class="feat-icon">🔐</div><div class="feat-name">Escrow Payments</div><div class="feat-desc">Bounties lock via Pi Network the moment a task posts. Funds release only after you approve the completed work.</div></div>
+        <div class="feat-card"><div class="feat-icon">⚡</div><div class="feat-name">Live Task Board</div><div class="feat-desc">Real-time task feed across 7 categories with countdown timers, claim slots, and live bounty tracking.</div></div>
+        <div class="feat-card"><div class="feat-icon">📈</div><div class="feat-name">Reputation System</div><div class="feat-desc">Trust scores build with every completed task. The leaderboard rewards consistency and quality work.</div></div>
+        <div class="feat-card"><div class="feat-icon">🗄️</div><div class="feat-name">MongoDB Backend</div><div class="feat-desc">Real persistent database. Tasks, users, and claims stored and synced globally in real time — no demo data ever.</div></div>
+        <div class="feat-card"><div class="feat-icon">🌍</div><div class="feat-name">60M+ Pioneers</div><div class="feat-desc">Post a task and instantly reach Pi Network's massive, engaged user base. Global reach from day one.</div></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="lsec" id="how-it-works">
+    <div class="lsec-inner">
+      <div class="lsec-tag">🗺 The Process</div>
+      <h2 class="lsec-h2">How It Works</h2>
+      <p class="lsec-sub">Six steps from task creation to Pi in your wallet.</p>
+      <div class="steps-wrap">
+        <div class="step-card"><div class="step-num">01</div><div class="step-title">Connect Wallet</div><div class="step-desc">Authenticate with Pi Browser or sign up with email to access Arena.</div></div>
+        <div class="step-card"><div class="step-num">02</div><div class="step-title">Post a Task</div><div class="step-desc">Define the work, set a Pi bounty, choose a deadline. Funds escrowed instantly.</div></div>
+        <div class="step-card"><div class="step-num">03</div><div class="step-title">Claim a Task</div><div class="step-desc">Browse the live board and claim tasks matching your skills.</div></div>
+        <div class="step-card"><div class="step-num">04</div><div class="step-title">Do the Work</div><div class="step-desc">Complete within the deadline. Quality work builds your trust score.</div></div>
+        <div class="step-card"><div class="step-num">05</div><div class="step-title">Submit Proof</div><div class="step-desc">Submit your result with a link or description for poster review.</div></div>
+        <div class="step-card"><div class="step-num">06</div><div class="step-title">Earn Pi</div><div class="step-desc">Poster approves — Pi Network releases the bounty to your wallet.</div></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="land-cta">
+    <div class="cta-glow"></div>
+    <div style="position:relative;max-width:600px;margin:0 auto;text-align:center;">
+      <img src="https://torbem-12.github.io/The-Arena/logo.png" alt="Arena" style="width:clamp(80px,12vw,120px);height:auto;margin:0 auto 24px;" onerror="this.style.display='none'"/>
+      <div class="cta-h2">Ready to Enter?</div>
+      <div class="cta-sub">Open inside Pi Browser for full payment functionality</div>
+      <div class="cta-url-box"><span class="cta-url" id="site-url">torbem-12.github.io/The-Arena</span></div>
+      <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+        <button class="btn btn-primary btn-xl" onclick="showAuth('signup')">Create Account →</button>
+        <button class="btn btn-xl" style="background:rgba(255,255,255,0.1);border:1.5px solid rgba(255,255,255,0.2);color:white;" onclick="showAuth('signin')">Sign In</button>
+      </div>
+    </div>
+  </section>
+  <footer class="land-footer"><span>Arena · Pi Network · MongoDB Atlas · Pi SDK v2.0 · © 2026</span></footer>
+</div>
+
+<!-- ══════════════════════════════════════
+     AUTH PAGE
+══════════════════════════════════════ -->
+<div id="pg-auth" class="page">
+  <div class="auth-wrap">
+    <div class="auth-logo-section">
+      <img src="https://torbem-12.github.io/The-Arena/logo.png" alt="Arena" style="width:88px;height:auto;" onerror="this.style.display='none'"/>
+      <div class="brand">Arena</div>
+    </div>
+    <div class="auth-card">
+      <div class="auth-tabs">
+        <button class="auth-tab active" id="at-si" onclick="switchAuthTab('signin')">Sign In</button>
+        <button class="auth-tab" id="at-su" onclick="switchAuthTab('signup')">Create Account</button>
+      </div>
+      <div id="pn-signin">
+        <div class="fgroup"><label class="flabel">Email address</label><input class="finput" id="si-email" type="email" placeholder="you@example.com" autocomplete="email"/></div>
+        <div class="fgroup"><label class="flabel">Password</label><input class="finput" id="si-pass" type="password" placeholder="••••••••" onkeydown="if(event.key==='Enter')doSignIn()" autocomplete="current-password"/></div>
+        <div class="ferror" id="si-err"></div>
+        <button class="btn btn-primary btn-full" id="si-btn" onclick="doSignIn()">Sign In</button>
+        <div class="auth-divider"><span>or</span></div>
+        <button class="btn-pi" onclick="doPiAuth()"><div class="pi-sym">π</div>Continue with Pi Wallet</button>
+        <p class="auth-note">No account? <span class="auth-link" onclick="switchAuthTab('signup')">Create one free</span></p>
+      </div>
+      <div id="pn-signup" style="display:none;">
+        <div class="fgroup"><label class="flabel">Display name</label><input class="finput" id="su-name" placeholder="Your name" autocomplete="name"/></div>
+        <div class="fgroup"><label class="flabel">Email address</label><input class="finput" id="su-email" type="email" placeholder="you@example.com" autocomplete="email"/></div>
+        <div class="fgroup"><label class="flabel">Password</label><input class="finput" id="su-pass" type="password" placeholder="Minimum 6 characters" onkeydown="if(event.key==='Enter')doSignUp()" autocomplete="new-password"/></div>
+        <div class="ferror" id="su-err"></div>
+        <div class="fsuccess" id="su-ok"></div>
+        <button class="btn btn-primary btn-full" id="su-btn" onclick="doSignUp()">Create Account</button>
+        <div class="auth-divider"><span>or</span></div>
+        <button class="btn-pi" onclick="doPiAuth()"><div class="pi-sym">π</div>Continue with Pi Wallet</button>
+        <p class="auth-note">Have an account? <span class="auth-link" onclick="switchAuthTab('signin')">Sign in</span></p>
+      </div>
+    </div>
+    <p style="text-align:center;margin-top:16px;"><button class="btn btn-ghost btn-sm" onclick="showPage('pg-landing')">← Back to Home</button></p>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     MAIN APP
+══════════════════════════════════════ -->
+<div id="pg-app" class="page">
+  <header class="app-hdr">
+    <div class="hdr-left">
+      <div class="arena-logo" onclick="showPage('pg-landing')">
+        <img src="https://torbem-12.github.io/The-Arena/logo.png" alt="Arena" style="height:38px;width:auto;" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"/>
+        <div style="display:none;width:34px;height:34px;background:var(--gold-bg);border:1.5px solid var(--gold-border);border-radius:9px;align-items:center;justify-content:center;font-size:18px;font-weight:900;color:var(--gold);">A</div>
+        <span class="arena-logo-text">Arena</span>
+      </div>
+      <div class="live-pill"><div class="live-dot"></div>Live</div>
+    </div>
+    <div class="hdr-right">
+      <button class="theme-btn" onclick="toggleTheme()" id="theme-btn-app">🌙</button>
+      <div class="user-menu" onclick="switchAppTab('profile',document.querySelectorAll('.tab-btn')[3])">
+        <div class="user-av" id="hdr-av">A</div>
+        <span class="user-nm" id="hdr-nm">Pioneer</span>
+        <span style="font-size:11px;color:var(--text3);">▾</span>
+      </div>
+      <button class="btn btn-primary btn-sm" onclick="openPostModal()">+ Post Task</button>
+      <button class="btn btn-ghost btn-icon" onclick="doSignOut()" title="Sign out">↪</button>
+    </div>
+  </header>
+
+  <div class="dash-wrap">
+    <div class="dash-inner">
+      <div class="dash-greeting">Welcome back, <span class="name" id="dash-name">Pioneer</span> 👋</div>
+      <div class="dash-grid">
+        <div class="dstat"><div class="dstat-val" style="color:var(--green)" id="ds-live">—</div><div class="dstat-key">Live Tasks</div></div>
+        <div class="dstat"><div class="dstat-val" style="color:var(--gold)" id="ds-pi">—</div><div class="dstat-key">π In Bounties</div></div>
+        <div class="dstat"><div class="dstat-val" id="ds-claims">—</div><div class="dstat-key">My Claims</div></div>
+        <div class="dstat"><div class="dstat-val" style="color:var(--gold)" id="ds-earn">—</div><div class="dstat-key">π Earned</div></div>
+      </div>
+      <div class="dash-actions">
+        <button class="btn btn-primary btn-sm" onclick="openPostModal()">+ Post Task</button>
+        <button class="btn btn-secondary btn-sm" onclick="switchAppTab('browse',document.querySelectorAll('.tab-btn')[0])">Browse Tasks</button>
+        <button class="btn btn-secondary btn-sm" onclick="switchAppTab('mine',document.querySelectorAll('.tab-btn')[1])">My Tasks</button>
+        <button class="btn btn-secondary btn-sm" onclick="switchAppTab('board',document.querySelectorAll('.tab-btn')[2])">Leaderboard</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="search-wrap">
+    <div class="search-inner">
+      <div class="search-box">
+        <span class="search-ico">🔍</span>
+        <input placeholder="Search tasks by title, category, or skill..." id="search-inp" oninput="handleSearch(this.value)"/>
+      </div>
+      <select class="sort-sel" id="sort-sel" onchange="loadTasks()">
+        <option value="newest">Newest First</option>
+        <option value="bounty">Highest Bounty</option>
+        <option value="deadline">Ending Soon</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="tabs-bar">
+    <button class="tab-btn active" onclick="switchAppTab('browse',this)">Browse Tasks</button>
+    <button class="tab-btn" onclick="switchAppTab('mine',this)">My Tasks <span class="tab-count" id="mine-count">0</span></button>
+    <button class="tab-btn" onclick="switchAppTab('board',this)">Leaderboard</button>
+    <button class="tab-btn" onclick="switchAppTab('profile',this)">Profile</button>
+  </div>
+
+  <div class="app-main">
+    <div class="tsec active" id="sec-browse">
+      <div class="filter-bar" id="filter-bar"></div>
+      <div class="task-grid" id="task-grid">
+        <div class="task-card" style="pointer-events:none;"><div class="skeleton" style="height:220px;"></div></div>
+        <div class="task-card" style="pointer-events:none;"><div class="skeleton" style="height:220px;"></div></div>
+        <div class="task-card" style="pointer-events:none;"><div class="skeleton" style="height:220px;"></div></div>
+      </div>
+    </div>
+
+    <div class="tsec" id="sec-mine">
+      <div class="sec-label">Your Active Tasks</div>
+      <div id="mine-wrap"></div>
+      <div class="earn-sum" id="earn-sum" style="display:none">
+        <div><div class="eblock-val" id="es-pi">π 0.0</div><div class="eblock-key">In Escrow</div></div>
+        <div><div class="eblock-val" style="color:var(--text)" id="es-cnt">0</div><div class="eblock-key">Tasks Claimed</div></div>
+        <div><div class="eblock-val" style="color:var(--green)" id="es-done">0</div><div class="eblock-key">Completed</div></div>
+      </div>
+    </div>
+
+    <div class="tsec" id="sec-board">
+      <div class="sec-label">Top Earners This Week</div>
+      <div id="lb-wrap"></div>
+      <p style="margin-top:16px;font-size:13px;color:var(--text3);text-align:center;">Rankings update as tasks are completed</p>
+    </div>
+
+    <div class="tsec" id="sec-profile">
+      <div class="prof-layout">
+        <div>
+          <div class="prof-card">
+            <div class="prof-av" id="prof-av">A</div>
+            <div class="prof-name" id="prof-name">Pioneer</div>
+            <div class="prof-handle" id="prof-handle">@pioneer</div>
+            <div class="prof-stats">
+              <div class="pstat"><div class="pstat-val" id="ps-claimed">0</div><div class="pstat-key">Claimed</div></div>
+              <div class="pstat"><div class="pstat-val" id="ps-done">0</div><div class="pstat-key">Done</div></div>
+              <div class="pstat"><div class="pstat-val" id="ps-posted">0</div><div class="pstat-key">Posted</div></div>
+              <div class="pstat"><div class="pstat-val" id="ps-earn">0</div><div class="pstat-key">π Earned</div></div>
+            </div>
+            <div class="trust-wrap">
+              <div class="trust-hdr"><span>Trust Score</span><span id="p-trust-lbl">0 / 100</span></div>
+              <div class="trust-track"><div class="trust-fill" id="p-trust-fill" style="width:0%"></div></div>
+            </div>
+            <div class="prof-actions">
+              <button class="btn btn-primary btn-full btn-sm" onclick="openPostModal()">+ Post New Task</button>
+              <button class="btn btn-secondary btn-full btn-sm" onclick="doSignOut()">↪ Sign Out</button>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div class="prof-activity">
+            <div class="act-title">Recent Activity</div>
+            <div id="act-list">
+              <div class="empty-state" style="padding:40px 0;">
+                <div class="empty-icon">📋</div>
+                <div class="empty-title">No activity yet</div>
+                <div class="empty-sub">Claim or post a task to see your history here</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <footer class="app-footer"><span>Arena · Pi Network · MongoDB Atlas · Pi SDK v2.0</span></footer>
+</div>
+
+<!-- POST TASK MODAL -->
+<div class="overlay" id="m-post">
+  <div class="modal">
+    <div class="modal-hd"><div class="modal-title">Post a Task</div><button class="modal-x" onclick="closeModal('m-post')">✕</button></div>
+    <div class="fgroup"><label class="flabel">Task Title *</label><input class="finput" id="pt-title" placeholder="e.g. Translate my app to French"/></div>
+    <div class="frow">
+      <div class="fgroup"><label class="flabel">Category *</label><select class="fselect" id="pt-cat"><option>Translation</option><option>Design</option><option>Testing</option><option>Data</option><option>Survey</option><option>Writing</option><option>Dev</option></select></div>
+      <div class="fgroup"><label class="flabel">Bounty Per Worker (π) *</label><input class="finput" id="pt-bounty" type="number" min="0.1" step="0.1" placeholder="e.g. 5.0" oninput="updatePayCalc()"/></div>
+    </div>
+    <div class="frow">
+      <div class="fgroup"><label class="flabel">Max Workers</label><input class="finput" id="pt-workers" type="number" min="1" max="100" value="1" oninput="updatePayCalc()"/></div>
+      <div class="fgroup"><label class="flabel">Deadline (Hours)</label><input class="finput" id="pt-hours" type="number" min="1" max="168" value="24"/></div>
+    </div>
+    <div class="fgroup"><label class="flabel">Skills (comma separated)</label><input class="finput" id="pt-skills" placeholder="e.g. Spanish, Copywriting"/></div>
+    <div class="fgroup"><label class="flabel">Description *</label><textarea class="ftextarea" id="pt-desc" placeholder="Describe exactly what needs to be done..."></textarea></div>
+    <div class="pay-box">
+      <div class="pay-box-label">Pi Payment Summary</div>
+      <div class="pay-box-row"><span style="font-size:13px;color:var(--text2);" id="pt-calc-lbl">—</span><span class="pay-big" id="pt-calc-amt">π —</span></div>
+      <div class="pay-box-sub">Full amount escrowed via Pi Network on post. Released to workers upon your approval.</div>
+    </div>
+    <div class="ferror" id="pt-err"></div>
+    <button class="btn btn-primary btn-full" id="pt-sub" onclick="submitPost()">🔒 Post & Escrow Bounty</button>
+  </div>
+</div>
+
+<!-- DETAIL MODAL -->
+<div class="overlay" id="m-detail">
+  <div class="modal">
+    <div class="modal-hd">
+      <div style="display:flex;align-items:center;gap:8px;">
+        <span class="badge badge-gray" id="dd-cat"></span>
+        <span class="badge badge-gold" id="dd-hot" style="display:none;">🔥 Hot</span>
+      </div>
+      <button class="modal-x" onclick="closeModal('m-detail')">✕</button>
+    </div>
+    <h2 style="font-size:21px;font-weight:800;color:var(--text);margin-bottom:6px;letter-spacing:-0.03em;" id="dd-title"></h2>
+    <p style="font-size:13px;color:var(--text3);margin-bottom:22px;">Posted by <b style="color:var(--text2);" id="dd-poster"></b></p>
+    <div class="dstat-row">
+      <div class="dstat-cell"><div class="dstat-val" style="color:var(--gold);" id="dd-bounty"></div><div class="dstat-key">Bounty</div></div>
+      <div class="dstat-cell"><div class="dstat-val" style="color:var(--green);" id="dd-slots"></div><div class="dstat-key">Slots Left</div></div>
+      <div class="dstat-cell"><div class="dstat-val" id="dd-timer"></div><div class="dstat-key">Time Left</div></div>
+    </div>
+    <p class="task-desc-text" id="dd-desc"></p>
+    <div id="dd-skills-wrap"></div>
+    <div class="how-box">
+      <div class="how-label">How Payment Works</div>
+      <div class="how-step"><div class="how-step-n">1</div><div class="how-step-t">Claim this task — completely free, no Pi needed upfront</div></div>
+      <div class="how-step"><div class="how-step-n">2</div><div class="how-step-t">Complete the work within the deadline</div></div>
+      <div class="how-step"><div class="how-step-n">3</div><div class="how-step-t">Submit your result with proof of completion</div></div>
+      <div class="how-step"><div class="how-step-n">4</div><div class="how-step-t">Poster approves → π released directly to your wallet</div></div>
+    </div>
+    <button class="claim-btn" id="dd-claim-btn" onclick="claimFromDetail()"></button>
+  </div>
+</div>
+
+<!-- SUBMIT WORK MODAL -->
+<div class="overlay" id="m-submit">
+  <div class="modal">
+    <div class="modal-hd"><div class="modal-title">Submit Work</div><button class="modal-x" onclick="closeModal('m-submit')">✕</button></div>
+    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px 14px;margin-bottom:18px;font-size:13px;color:var(--text2);font-weight:500;" id="sw-task-name"></div>
+    <div class="fgroup"><label class="flabel">Work Link (optional)</label><input class="finput" id="sw-link" placeholder="https://drive.google.com/... or any URL"/></div>
+    <div class="fgroup"><label class="flabel">Description of Work Done *</label><textarea class="ftextarea" id="sw-desc" placeholder="Describe what you completed and how it meets the requirements..."></textarea></div>
+    <div class="ferror" id="sw-err"></div>
+    <div class="fsuccess" id="sw-ok"></div>
+    <button class="btn btn-primary btn-full" id="sw-btn" onclick="submitWork()">Submit for Review</button>
+  </div>
+</div>
+
+<script>
+/* ============================================================
+   ARENA — Production JavaScript
+   - No demo data, no seeds, no fake IDs
+   - All data from real MongoDB backend via Render
+   - Pi SDK v2.0 per official docs
+   - Chrome/Firefox/Safari compatible
+   ============================================================ */
+'use strict';
+
+// ── CONFIG ────────────────────────────────────────────────────────────────────
+const API = (() => {
+  const h = window.location.hostname;
+  return (h === 'localhost' || h === '127.0.0.1')
+    ? 'http://localhost:3000'
+    : 'https://the-arena-xllw.onrender.com';
+})();
+
+const CATS = ['All','Translation','Design','Testing','Data','Survey','Writing','Dev'];
+
+// ── PI SDK — safe detection, never blocks rendering ───────────────────────────
+// Pi SDK is injected by Pi Browser as window.Pi
+// We detect it safely so Chrome/Firefox render normally without it
+const PiSDK = (typeof window !== 'undefined' && window.Pi) ? window.Pi : null;
+const IS_PI_BROWSER = !!PiSDK;
+
+// ── STATE ─────────────────────────────────────────────────────────────────────
+let authToken    = localStorage.getItem('arena_token') || null;
+let currentUser  = (() => {
+  try { return JSON.parse(localStorage.getItem('arena_user') || 'null'); } catch { return null; }
+})();
+let tasks        = [];   // populated ONLY from GET /api/tasks — never from client-side data
+let myClaims     = [];   // populated ONLY from GET /api/claims/mine
+let actLog       = [];
+let activeFilter = 'All';
+let searchQ      = '';
+let detailId     = null;
+let submitId     = null;
+let _searchTimer = null;
+let _cdInterval  = null;
+let _toastTimer  = null;
+
+// ── THEME ─────────────────────────────────────────────────────────────────────
+(function initTheme() {
+  const t = localStorage.getItem('arena_theme') || 'light';
+  document.documentElement.setAttribute('data-theme', t);
+  updateThemeIcons(t);
+}());
+
+function updateThemeIcons(t) {
+  const icon = t === 'dark' ? '☀️' : '🌙';
+  ['theme-btn','theme-btn-app'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = icon;
+  });
+}
+
+function toggleTheme() {
+  const cur  = document.documentElement.getAttribute('data-theme');
+  const next = cur === 'light' ? 'dark' : 'light';
+  localStorage.setItem('arena_theme', next);
+  document.documentElement.setAttribute('data-theme', next);
+  updateThemeIcons(next);
+}
+
+// ── TOAST ─────────────────────────────────────────────────────────────────────
+function toast(msg, type) {
+  type = type || 's';
+  const el = document.getElementById('toast');
+  if (!el) return;
+  const icons = { s: '✓', e: '✕', w: '⚠' };
+  el.innerHTML = '<span style="flex-shrink:0">' + (icons[type] || 'ℹ') + '</span><span>' + msg + '</span>';
+  el.className = 'visible t-' + type;
+  clearTimeout(_toastTimer);
+  _toastTimer = setTimeout(function() { el.className = ''; }, 3800);
+}
+
+// ── API HELPER ────────────────────────────────────────────────────────────────
+async function api(method, path, body) {
+  var headers = { 'Content-Type': 'application/json' };
+  if (authToken) headers['Authorization'] = 'Bearer ' + authToken;
+  var opts = { method: method, headers: headers };
+  if (body) opts.body = JSON.stringify(body);
+  var res  = await fetch(API + path, opts);
+  var data = await res.json().catch(function() { return {}; });
+  if (!res.ok) throw new Error(data.error || ('Error ' + res.status));
+  return data;
+}
+
+// ── PAGE ROUTING ──────────────────────────────────────────────────────────────
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(function(p) { p.classList.remove('active'); });
+  var el = document.getElementById(id);
+  if (el) el.classList.add('active');
+
+  var banner = document.getElementById('not-pi-banner');
+  if (banner) {
+    banner.style.display = (!IS_PI_BROWSER && id !== 'pg-landing') ? 'block' : 'none';
+  }
+}
+
+function showAuth(tab) { showPage('pg-auth'); switchAuthTab(tab); }
+
+function switchAuthTab(tab) {
+  var si = document.getElementById('pn-signin');
+  var su = document.getElementById('pn-signup');
+  var ts = document.getElementById('at-si');
+  var tu = document.getElementById('at-su');
+  if (si) si.style.display = tab === 'signin' ? 'block' : 'none';
+  if (su) su.style.display = tab === 'signup' ? 'block' : 'none';
+  if (ts) ts.classList.toggle('active', tab === 'signin');
+  if (tu) tu.classList.toggle('active', tab === 'signup');
+}
+
+// ── MODALS ────────────────────────────────────────────────────────────────────
+function openModal(id)  { var el = document.getElementById(id); if (el) el.classList.add('open'); }
+function closeModal(id) { var el = document.getElementById(id); if (el) el.classList.remove('open'); }
+
+['m-post','m-detail','m-submit'].forEach(function(id) {
+  var el = document.getElementById(id);
+  if (el) el.addEventListener('click', function(e) { if (e.target === this) closeModal(id); });
+});
+
+// ── PI SDK AUTHENTICATION ─────────────────────────────────────────────────────
+// Per Pi SDK docs:
+//   1. await Pi.init({ version, sandbox }) — must complete before authenticate
+//   2. Pi.authenticate(['username'], onIncompletePayment) — username scope only at login
+//   3. Send accessToken to backend for validation via GET /v2/me
+//   4. Request 'payments' scope only at payment time via Pi.createPayment
+
+async function initPiSDK() {
+  if (!PiSDK) return false;
+  try {
+    var result = PiSDK.init({ version: '2.0', sandbox: false });
+    // Pi.init may return a Promise in some SDK versions — await it if so
+    if (result && typeof result.then === 'function') await result;
+    return true;
+  } catch (e) {
+    console.warn('[Arena] Pi.init error:', e.message);
+    return false;
+  }
+}
+
+async function doPiAuth() {
+  if (!IS_PI_BROWSER) {
+    toast('Open Arena inside Pi Browser to use Pi Wallet', 'w');
+    return;
+  }
+  try {
+    // Step 1: ensure SDK is ready
+    await initPiSDK();
+
+    // Step 2: authenticate with username scope only (per Pi SDK docs)
+    var auth = await PiSDK.authenticate(['username'], handleIncompletePayment);
+
+    // Step 3: send accessToken to backend for validation via GET /v2/me
+    var data = await api('POST', '/api/auth/pi', {
+      piUid:       auth.user.uid,
+      piUsername:  auth.user.username,
+      accessToken: auth.accessToken   // backend validates this with Pi /v2/me
+    });
+
+    authToken   = data.token;
+    currentUser = data.user;
+    localStorage.setItem('arena_token', authToken);
+    localStorage.setItem('arena_user',  JSON.stringify(currentUser));
+    enterApp();
+    toast('Pi Wallet connected — welcome, ' + auth.user.username + '!', 's');
+  } catch (e) {
+    console.error('[Arena] Pi auth failed:', e.message);
+    toast('Pi authentication failed: ' + (e.message || 'Please try again'), 'e');
+  }
+}
+
+async function handleIncompletePayment(payment) {
+  // Pi SDK calls this when a previous payment was never completed
+  // We must handle it — either complete or cancel via backend
+  try {
+    await api('POST', '/api/payments/incomplete', { paymentId: payment.identifier });
+  } catch (e) {
+    console.warn('[Arena] Incomplete payment handler error:', e.message);
+  }
+}
+
+// ── EMAIL AUTH ────────────────────────────────────────────────────────────────
+async function doSignIn() {
+  var email = (document.getElementById('si-email') || {}).value || '';
+  var pass  = (document.getElementById('si-pass')  || {}).value || '';
+  var err   = document.getElementById('si-err');
+  var btn   = document.getElementById('si-btn');
+  email = email.trim();
+  if (err) err.style.display = 'none';
+  if (!email || !pass) {
+    if (err) { err.textContent = 'Enter your email and password.'; err.style.display = 'block'; }
+    return;
+  }
+  if (btn) { btn.innerHTML = '<div class="loader"></div> Signing in…'; btn.disabled = true; }
+  try {
+    var data = await api('POST', '/api/auth/login', { email: email, password: pass });
+    authToken   = data.token;
+    currentUser = data.user;
+    localStorage.setItem('arena_token', authToken);
+    localStorage.setItem('arena_user',  JSON.stringify(currentUser));
+    enterApp();
+  } catch (e) {
+    if (err) { err.textContent = e.message || 'Sign in failed.'; err.style.display = 'block'; }
+  } finally {
+    if (btn) { btn.innerHTML = 'Sign In'; btn.disabled = false; }
+  }
+}
+
+async function doSignUp() {
+  var name  = (document.getElementById('su-name')  || {}).value || '';
+  var email = (document.getElementById('su-email') || {}).value || '';
+  var pass  = (document.getElementById('su-pass')  || {}).value || '';
+  var err   = document.getElementById('su-err');
+  var ok    = document.getElementById('su-ok');
+  var btn   = document.getElementById('su-btn');
+  name = name.trim(); email = email.trim();
+  if (err) err.style.display = 'none';
+  if (ok)  ok.style.display  = 'none';
+  if (!name || !email || !pass) {
+    if (err) { err.textContent = 'All fields are required.'; err.style.display = 'block'; }
+    return;
+  }
+  if (pass.length < 6) {
+    if (err) { err.textContent = 'Password must be at least 6 characters.'; err.style.display = 'block'; }
+    return;
+  }
+  if (btn) { btn.innerHTML = '<div class="loader"></div> Creating…'; btn.disabled = true; }
+  try {
+    var data = await api('POST', '/api/auth/register', { displayName: name, email: email, password: pass });
+    authToken   = data.token;
+    currentUser = data.user;
+    localStorage.setItem('arena_token', authToken);
+    localStorage.setItem('arena_user',  JSON.stringify(currentUser));
+    enterApp();
+  } catch (e) {
+    if (err) { err.textContent = e.message || 'Sign up failed.'; err.style.display = 'block'; }
+  } finally {
+    if (btn) { btn.innerHTML = 'Create Account'; btn.disabled = false; }
+  }
+}
+
+function doSignOut() {
+  authToken   = null;
+  currentUser = null;
+  tasks       = [];
+  myClaims    = [];
+  actLog      = [];
+  localStorage.removeItem('arena_token');
+  localStorage.removeItem('arena_user');
+  showPage('pg-landing');
+  toast('Signed out successfully', 's');
+}
+
+// ── ENTER APP ─────────────────────────────────────────────────────────────────
+function enterApp() {
+  showPage('pg-app');
+  var name = (currentUser && (currentUser.displayName || currentUser.piUsername)) || 'Pioneer';
+  var init = name.charAt(0).toUpperCase();
+  setEl('hdr-av',      init);
+  setEl('prof-av',     init);
+  setEl('hdr-nm',      name);
+  setEl('dash-name',   name);
+  setEl('prof-name',   name);
+  setEl('prof-handle', '@' + name.toLowerCase().replace(/\s+/g, '_'));
+  loadAll();
+}
+
+// ── LOAD ALL — only from real backend ────────────────────────────────────────
+function loadAll() {
+  Promise.allSettled([refreshUser(), loadStats(), loadTasks(), loadMyClaims(), loadLeaderboard()]);
+}
+
+async function refreshUser() {
+  try {
+    var d = await api('GET', '/api/auth/me');
+    if (d.user) {
+      currentUser = d.user;
+      localStorage.setItem('arena_user', JSON.stringify(currentUser));
+    }
+  } catch (e) { console.warn('[Arena] refreshUser:', e.message); }
+}
+
+async function loadStats() {
+  try {
+    var d = await api('GET', '/api/stats');
+    setEl('ds-live',  d.liveTasks  != null ? String(d.liveTasks)  : '—');
+    setEl('ds-pi',    d.totalPi    != null ? 'π' + parseFloat(d.totalPi).toFixed(1) : '—');
+    setEl('hs-live',  d.liveTasks  != null ? String(d.liveTasks)  : '—');
+    setEl('hs-pi',    d.totalPi    != null ? parseFloat(d.totalPi).toFixed(1) : '—');
+    setEl('hs-users', d.totalUsers != null ? String(d.totalUsers) : '—');
+  } catch (e) {
+    console.warn('[Arena] Stats load failed:', e.message);
+  }
+}
+
+async function loadTasks() {
+  var sort  = (document.getElementById('sort-sel') || {}).value || 'newest';
+  var catQ  = activeFilter !== 'All' ? '&category=' + encodeURIComponent(activeFilter) : '';
+  var srch  = searchQ ? '&search=' + encodeURIComponent(searchQ) : '';
+  try {
+    var d = await api('GET', '/api/tasks?sort=' + sort + catQ + srch);
+    // Map only real backend tasks — mark claimed using real MongoDB _id
+    tasks = (d.tasks || []).map(function(t) {
+      return Object.assign({}, t, {
+        claimed: myClaims.some(function(c) {
+          var cid = (c.taskId && c.taskId._id) ? c.taskId._id : c.taskId;
+          return String(cid) === String(t._id);
+        })
+      });
+    });
+    renderGrid();
+    updateClaimStats();
+  } catch (e) {
+    console.warn('[Arena] Tasks load failed:', e.message);
+    renderGridError();
+  }
+}
+
+async function loadMyClaims() {
+  try {
+    var d = await api('GET', '/api/claims/mine');
+    myClaims = d.claims || [];
+    renderMyTasks();
+    updateClaimStats();
+  } catch (e) {
+    console.warn('[Arena] Claims load failed:', e.message);
+    myClaims = [];
+    renderMyTasks();
+  }
+}
+
+async function loadLeaderboard() {
+  try {
+    var d = await api('GET', '/api/leaderboard');
+    renderLeaderboard(d.users || []);
+  } catch (e) {
+    console.warn('[Arena] Leaderboard load failed:', e.message);
+    renderLeaderboard([]);
+  }
+}
+
+function updateClaimStats() {
+  var mine  = tasks.filter(function(t) { return t.claimed; });
+  var total = mine.reduce(function(a, t) { return a + parseFloat(t.bounty || 0); }, 0);
+  setEl('ds-claims',  String(mine.length));
+  setEl('mine-count', String(mine.length));
+  setEl('ds-earn',    'π' + total.toFixed(1));
+}
+
+// ── SEARCH & FILTER ───────────────────────────────────────────────────────────
+function handleSearch(v) {
+  searchQ = v;
+  clearTimeout(_searchTimer);
+  _searchTimer = setTimeout(loadTasks, 380);
+}
+
+function setFilter(cat) {
+  activeFilter = cat;
+  renderFilterBar();
+  loadTasks();
+}
+
+function renderFilterBar() {
+  var bar = document.getElementById('filter-bar');
+  if (!bar) return;
+  bar.innerHTML = CATS.map(function(c) {
+    return '<button class="fchip' + (c === activeFilter ? ' active' : '') +
+           '" onclick="setFilter(\'' + c + '\')">' + c + '</button>';
+  }).join('') + '<span class="res-count" id="res-count"></span>';
+}
+
+// ── HELPERS ───────────────────────────────────────────────────────────────────
+function setEl(id, val) {
+  var el = document.getElementById(id);
+  if (el) el.textContent = val;
+}
+
+function cd(iso) {
+  var ms = new Date(iso).getTime() - Date.now();
+  if (ms <= 0) return 'Expired';
+  var h = Math.floor(ms / 3600000);
+  var m = Math.floor((ms % 3600000) / 60000);
+  var s = Math.floor((ms % 60000) / 1000);
+  return h > 0 ? (h + 'h ' + m + 'm') : m > 0 ? (m + 'm ' + s + 's') : (s + 's');
+}
+
+function tClass(iso) {
+  var ms = new Date(iso).getTime() - Date.now();
+  return ms < 1800000 ? 'tc-urg' : ms < 7200000 ? 'tc-warn' : 'tc-safe';
+}
+
+function tColor(iso) {
+  var ms = new Date(iso).getTime() - Date.now();
+  return ms < 1800000 ? 'var(--red-text)' : ms < 7200000 ? 'var(--amber-text)' : 'var(--green-text)';
+}
+
+function pColor(p) {
+  return p > 80 ? 'var(--red)' : p > 50 ? 'var(--amber)' : 'var(--green)';
+}
+
+// ── RENDER TASK GRID — real backend data only ─────────────────────────────────
+function renderGrid() {
+  renderFilterBar();
+  var rc = document.getElementById('res-count');
+  if (rc) rc.textContent = tasks.length + ' task' + (tasks.length !== 1 ? 's' : '');
+  var grid = document.getElementById('task-grid');
+  if (!grid) return;
+
+  if (!tasks.length) {
+    grid.innerHTML = '<div class="empty-state">' +
+      '<div class="empty-icon">📋</div>' +
+      '<div class="empty-title">No live tasks yet</div>' +
+      '<div class="empty-sub">Be the first Pioneer to post a task and start earning Pi.</div>' +
+      '<button class="btn btn-primary btn-sm" onclick="openPostModal()">+ Post the First Task</button>' +
+      '</div>';
+    return;
+  }
+
+  grid.innerHTML = tasks.map(function(t) {
+    // ALWAYS use the real MongoDB _id from the backend — never a generated ID
+    var id   = String(t._id);
+    var pct  = Math.round(((t.claimsCount || 0) / (t.maxClaims || 1)) * 100);
+    var full = (t.claimsCount || 0) >= (t.maxClaims || 1);
+    var btnCls, btnTxt, dis;
+    if (t.claimed)    { btnCls = 'cb-claimed'; btnTxt = '✓ Claimed';       dis = 'disabled'; }
+    else if (full)    { btnCls = 'cb-full';    btnTxt = 'All Slots Filled'; dis = 'disabled'; }
+    else              { btnCls = 'cb-open';    btnTxt = 'Claim Task';       dis = ''; }
+    var skills = (t.skills || []).map(function(s) {
+      return '<span class="tc-skill">' + s + '</span>';
+    }).join('');
+    return '<div class="task-card' + (t.hot ? ' is-hot' : '') + '" onclick="openDetail(\'' + id + '\')">' +
+      '<div class="tc-tags">' +
+        '<span class="badge badge-gray" style="font-size:11px;">' + (t.category || '') + '</span>' +
+        (t.hot ? '<span class="badge badge-gold" style="font-size:11px;">🔥 Hot</span>' : '') +
+        '<span class="tc-timer ' + tClass(t.deadline) + '" style="margin-left:auto;">⏱ ' + cd(t.deadline) + '</span>' +
+      '</div>' +
+      '<div class="tc-body">' +
+        '<div style="flex:1;">' +
+          '<div class="tc-title">' + (t.title || '') + '</div>' +
+          '<div class="tc-poster">by <b>' + (t.posterName || 'Pioneer') + '</b></div>' +
+        '</div>' +
+        '<div>' +
+          '<div class="tc-bounty-val">π' + parseFloat(t.bounty || 0).toFixed(1) + '</div>' +
+          '<div class="tc-bounty-key">BOUNTY</div>' +
+        '</div>' +
+      '</div>' +
+      '<div class="tc-prog-row"><span>' + (t.claimsCount || 0) + '/' + (t.maxClaims || 1) + ' claimed</span>' +
+        '<span>' + ((t.maxClaims || 1) - (t.claimsCount || 0)) + ' left</span></div>' +
+      '<div class="tc-prog-track"><div class="tc-prog-fill" style="width:' + pct + '%;background:' + pColor(pct) + ';"></div></div>' +
+      '<div class="tc-skills">' + skills + '</div>' +
+      '<button class="claim-btn ' + btnCls + '" onclick="event.stopPropagation();claimTask(\'' + id + '\')" ' + dis + '>' + btnTxt + '</button>' +
+    '</div>';
+  }).join('');
+
+  clearInterval(_cdInterval);
+  _cdInterval = setInterval(renderGrid, 30000);
+}
+
+function renderGridError() {
+  var grid = document.getElementById('task-grid');
+  if (!grid) return;
+  grid.innerHTML = '<div class="empty-state">' +
+    '<div class="empty-icon">⚠️</div>' +
+    '<div class="empty-title">Could not load tasks</div>' +
+    '<div class="empty-sub">Check your connection or try again in a moment.</div>' +
+    '<button class="btn btn-secondary btn-sm" onclick="loadTasks()">Try Again</button>' +
+    '</div>';
+}
+
+// ── CLAIM TASK — uses real MongoDB _id from backend ───────────────────────────
+async function claimTask(id) {
+  if (!currentUser) { showAuth('signin'); return; }
+  // Find task using the real MongoDB _id — no generated IDs allowed
+  var t = tasks.find(function(x) { return String(x._id) === String(id); });
+  if (!t || t.claimed || (t.claimsCount || 0) >= (t.maxClaims || 1)) return;
+  try {
+    // POST /api/tasks/:id/claim where :id is the real MongoDB ObjectId
+    await api('POST', '/api/tasks/' + id + '/claim');
+    t.claimed     = true;
+    t.claimsCount = (t.claimsCount || 0) + 1;
+    myClaims.push({ taskId: t, status: 'in_progress' });
+    addActivity('Claimed task: ' + t.title, t.bounty, '📋');
+    updateClaimStats();
+    renderGrid();
+    renderMyTasks();
+    toast('Task claimed! π' + parseFloat(t.bounty || 0).toFixed(1) + ' in escrow for you.', 's');
+  } catch (e) {
+    toast('Claim failed: ' + (e.message || 'Please try again'), 'e');
+  }
+}
+
+// ── TAB SWITCHING ─────────────────────────────────────────────────────────────
+function switchAppTab(id, btn) {
+  document.querySelectorAll('.tab-btn').forEach(function(b) { b.classList.remove('active'); });
+  document.querySelectorAll('.tsec').forEach(function(s) { s.classList.remove('active'); });
+  if (btn) btn.classList.add('active');
+  var sec = document.getElementById('sec-' + id);
+  if (sec) sec.classList.add('active');
+  if (id === 'board')   loadLeaderboard();
+  if (id === 'profile') renderProfile();
+}
+
+// ── DETAIL MODAL ──────────────────────────────────────────────────────────────
+function openDetail(id) {
+  var t = tasks.find(function(x) { return String(x._id) === String(id); });
+  if (!t) return;
+  detailId      = id;
+  var full      = (t.claimsCount || 0) >= (t.maxClaims || 1);
+  var catEl     = document.getElementById('dd-cat');
+  var hotEl     = document.getElementById('dd-hot');
+  var timerEl   = document.getElementById('dd-timer');
+  var skillsEl  = document.getElementById('dd-skills-wrap');
+  var cb        = document.getElementById('dd-claim-btn');
+  if (catEl)    catEl.textContent    = t.category || '';
+  if (hotEl)    hotEl.style.display  = t.hot ? 'inline-flex' : 'none';
+  setEl('dd-title',   t.title || '');
+  setEl('dd-poster',  t.posterName || 'Pioneer');
+  setEl('dd-bounty',  'π ' + parseFloat(t.bounty || 0).toFixed(1));
+  setEl('dd-slots',   String((t.maxClaims || 1) - (t.claimsCount || 0)));
+  if (timerEl)  { timerEl.textContent = cd(t.deadline); timerEl.style.color = tColor(t.deadline); }
+  setEl('dd-desc', t.description || '');
+  if (skillsEl) {
+    skillsEl.innerHTML = (t.skills || []).length
+      ? '<div class="tc-skills" style="margin-bottom:18px;">' +
+        (t.skills || []).map(function(s) { return '<span class="tc-skill">' + s + '</span>'; }).join('') +
+        '</div>'
+      : '';
+  }
+  if (cb) {
+    if (t.claimed) {
+      cb.textContent = '✓ Already Claimed'; cb.className = 'claim-btn cb-claimed'; cb.disabled = true;
+    } else if (full) {
+      cb.textContent = 'All Slots Filled';  cb.className = 'claim-btn cb-full';    cb.disabled = true;
+    } else {
+      cb.textContent = 'Claim & Start Working →'; cb.className = 'claim-btn cb-open'; cb.disabled = false;
+    }
+  }
+  openModal('m-detail');
+}
+
+function claimFromDetail() { if (detailId) { claimTask(detailId); closeModal('m-detail'); } }
+
+// ── POST TASK ─────────────────────────────────────────────────────────────────
+function openPostModal() { if (!currentUser) { showAuth('signin'); return; } openModal('m-post'); updatePayCalc(); }
+
+function updatePayCalc() {
+  var b   = parseFloat((document.getElementById('pt-bounty')  || {}).value) || 0;
+  var w   = parseInt( (document.getElementById('pt-workers') || {}).value) || 1;
+  var lbl = document.getElementById('pt-calc-lbl');
+  var amt = document.getElementById('pt-calc-amt');
+  if (lbl) lbl.textContent = 'π' + b.toFixed(1) + ' × ' + w + ' worker' + (w > 1 ? 's' : '');
+  if (amt) amt.textContent = 'π ' + (b * w).toFixed(1);
+}
+
+async function submitPost() {
+  var title   = ((document.getElementById('pt-title')   || {}).value || '').trim();
+  var cat     =  (document.getElementById('pt-cat')     || {}).value || '';
+  var bounty  = parseFloat((document.getElementById('pt-bounty')  || {}).value);
+  var workers = parseInt( (document.getElementById('pt-workers') || {}).value) || 1;
+  var hours   = parseInt( (document.getElementById('pt-hours')   || {}).value) || 24;
+  var skills  =  (document.getElementById('pt-skills')  || {}).value || '';
+  var desc    = ((document.getElementById('pt-desc')    || {}).value || '').trim();
+  var errEl   =  document.getElementById('pt-err');
+  var btn     =  document.getElementById('pt-sub');
+  if (errEl) errEl.style.display = 'none';
+  if (!title || !bounty || !desc) {
+    if (errEl) { errEl.textContent = 'Please fill in all required fields.'; errEl.style.display = 'block'; }
+    return;
+  }
+  if (btn) { btn.innerHTML = '<div class="loader"></div> Processing…'; btn.disabled = true; }
+
+  var txid = 'no-pi-' + Date.now();
+
+  // Pi payment — request 'payments' scope at payment time (NOT at login)
+  if (IS_PI_BROWSER && PiSDK) {
+    try {
+      txid = await createPiPayment(bounty * workers, 'Arena escrow: ' + title, { title: title, category: cat });
+    } catch (e) {
+      if (errEl) { errEl.textContent = 'Payment: ' + (e.message || 'Failed'); errEl.style.display = 'block'; }
+      if (btn)   { btn.innerHTML = '🔒 Post & Escrow Bounty'; btn.disabled = false; }
+      return;
+    }
+  }
+
+  try {
+    var skillArr = skills ? skills.split(',').map(function(s) { return s.trim(); }).filter(Boolean) : [];
+    var data = await api('POST', '/api/tasks', {
+      title:        title,
+      category:     cat,
+      bounty:       bounty,
+      description:  desc,
+      skills:       skillArr,
+      maxClaims:    workers,
+      deadlineHours: hours,
+      txid:         txid
+    });
+    tasks.unshift(Object.assign({}, data.task, { claimed: false }));
+    renderGrid();
+    updateClaimStats();
+    closeModal('m-post');
+    addActivity('Posted: ' + title, bounty, '📤');
+    toast('Task posted! π' + (bounty * workers).toFixed(1) + ' escrowed.', 's');
+    ['pt-title','pt-bounty','pt-skills','pt-desc'].forEach(function(id) {
+      var el = document.getElementById(id); if (el) el.value = '';
+    });
+    var pw = document.getElementById('pt-workers'); if (pw) pw.value = 1;
+    var ph = document.getElementById('pt-hours');   if (ph) ph.value = 24;
+  } catch (e) {
+    if (errEl) { errEl.textContent = e.message || 'Post failed.'; errEl.style.display = 'block'; }
+  } finally {
+    if (btn) { btn.innerHTML = '🔒 Post & Escrow Bounty'; btn.disabled = false; }
+  }
+}
+
+// ── PI PAYMENT — requests 'payments' scope at payment time ────────────────────
+async function createPiPayment(amount, memo, metadata) {
+  return new Promise(function(resolve, reject) {
+    PiSDK.createPayment(
+      { amount: amount, memo: memo, metadata: metadata },
+      {
+        onReadyForServerApproval: async function(paymentId) {
+          try {
+            await api('POST', '/api/payments/approve', { paymentId: paymentId, metadata: metadata });
+          } catch (e) { reject(e); }
+        },
+        onReadyForServerCompletion: async function(paymentId, txid) {
+          try {
+            await api('POST', '/api/payments/complete', { paymentId: paymentId, txid: txid });
+            resolve(txid);
+          } catch (e) { reject(e); }
+        },
+        onCancel: function() { reject(new Error('Payment cancelled')); },
+        onError:  function(e) { reject(e instanceof Error ? e : new Error(String(e))); }
+      }
+    );
+  });
+}
+
+// ── MY TASKS — real claims from backend only ──────────────────────────────────
+function renderMyTasks() {
+  var mine = tasks.filter(function(t) { return t.claimed; });
+  setEl('mine-count', String(mine.length));
+  var wrap = document.getElementById('mine-wrap');
+  if (!wrap) return;
+  if (!mine.length) {
+    wrap.innerHTML = '<div class="empty-state">' +
+      '<div class="empty-icon">📋</div>' +
+      '<div class="empty-title">No claimed tasks yet</div>' +
+      '<div class="empty-sub">Browse the live task board and claim tasks matching your skills.</div>' +
+      '<button class="btn btn-primary btn-sm" onclick="switchAppTab(\'browse\',document.querySelectorAll(\'.tab-btn\')[0])">Browse Tasks →</button>' +
+      '</div>';
+    var es = document.getElementById('earn-sum'); if (es) es.style.display = 'none';
+    return;
+  }
+  wrap.innerHTML = mine.map(function(t) {
+    return '<div class="my-task-card">' +
+      '<div class="mt-top">' +
+        '<span class="badge badge-gray" style="font-size:11px;">' + (t.category || '') + '</span>' +
+        '<span class="badge badge-green" style="font-size:11px;">In Progress</span>' +
+      '</div>' +
+      '<div class="mt-title">' + (t.title || '') + '</div>' +
+      '<div class="mt-foot">' +
+        '<span class="tc-timer ' + tClass(t.deadline) + '">⏱ ' + cd(t.deadline) + '</span>' +
+        '<div style="display:flex;align-items:center;gap:12px;">' +
+          '<span style="font-size:20px;font-weight:900;color:var(--gold);letter-spacing:-0.04em;">π ' + parseFloat(t.bounty || 0).toFixed(1) + '</span>' +
+          '<button class="submit-btn" onclick="openSubmitModal(\'' + t._id + '\',\'' + (t.title || '').replace(/'/g, "\\'") + '\')">Submit Work →</button>' +
+        '</div>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+  var total = mine.reduce(function(a, t) { return a + parseFloat(t.bounty || 0); }, 0);
+  setEl('es-pi',  'π ' + total.toFixed(1));
+  setEl('es-cnt', String(mine.length));
+  setEl('es-done', String(mine.filter(function(t) { return t.status === 'completed'; }).length));
+  var es = document.getElementById('earn-sum'); if (es) es.style.display = 'grid';
+}
+
+// ── SUBMIT WORK ───────────────────────────────────────────────────────────────
+function openSubmitModal(taskId, taskTitle) {
+  submitId = taskId;
+  var nm = document.getElementById('sw-task-name');
+  if (nm) nm.textContent = 'Task: ' + taskTitle;
+  ['sw-link','sw-desc'].forEach(function(id) { var el = document.getElementById(id); if (el) el.value = ''; });
+  ['sw-err','sw-ok'].forEach(function(id)   { var el = document.getElementById(id); if (el) el.style.display = 'none'; });
+  openModal('m-submit');
+}
+
+async function submitWork() {
+  var desc  = ((document.getElementById('sw-desc') || {}).value || '').trim();
+  var link  = ((document.getElementById('sw-link') || {}).value || '').trim();
+  var errEl =   document.getElementById('sw-err');
+  var okEl  =   document.getElementById('sw-ok');
+  var btn   =   document.getElementById('sw-btn');
+  if (errEl) errEl.style.display = 'none';
+  if (okEl)  okEl.style.display  = 'none';
+  if (!desc) {
+    if (errEl) { errEl.textContent = 'Please describe your work.'; errEl.style.display = 'block'; }
+    return;
+  }
+  if (btn) { btn.innerHTML = '<div class="loader"></div> Submitting…'; btn.disabled = true; }
+  try {
+    await api('POST', '/api/submissions', { taskId: submitId, workLink: link, description: desc });
+    if (okEl) { okEl.textContent = '✓ Submitted! The poster will review it shortly.'; okEl.style.display = 'block'; }
+    addActivity('Submitted work for review', null, '✅');
+    toast('Work submitted successfully!', 's');
+    setTimeout(function() { closeModal('m-submit'); }, 2000);
+  } catch (e) {
+    if (errEl) { errEl.textContent = e.message || 'Submit failed.'; errEl.style.display = 'block'; }
+  } finally {
+    if (btn) { btn.innerHTML = 'Submit for Review'; btn.disabled = false; }
+  }
+}
+
+// ── LEADERBOARD — real backend data only, no fabricated rankings ──────────────
+function renderLeaderboard(users) {
+  var wrap = document.getElementById('lb-wrap');
+  if (!wrap) return;
+  if (!users || !users.length) {
+    wrap.innerHTML = '<div class="empty-state">' +
+      '<div class="empty-icon">🏆</div>' +
+      '<div class="empty-title">No rankings yet</div>' +
+      '<div class="empty-sub">The first completed task will create the leaderboard. Be the pioneer!</div>' +
+      '</div>';
+    return;
+  }
+  var styles = ['lb-gold','lb-silver','lb-bronze','',''];
+  var medals = ['🥇','🥈','🥉','',''];
+  wrap.innerHTML = users.map(function(u, i) {
+    var isMe = currentUser && (String(u._id) === String(currentUser.id) || String(u._id) === String(currentUser._id));
+    return '<div class="lb-row ' + (isMe ? 'lb-you' : (styles[i] || '')) + '">' +
+      '<div class="lb-rank">' + (medals[i] || String(i + 1)) + '</div>' +
+      '<div class="lb-info">' +
+        '<div class="lb-name">' + (u.displayName || u.piUsername || 'Pioneer') + (isMe ? ' (you)' : '') + '</div>' +
+        '<div class="lb-meta">' + (u.tasksCompleted || 0) + ' tasks · Trust: ' + (u.trustScore || 0) + '</div>' +
+      '</div>' +
+      '<div style="text-align:right;">' +
+        '<div class="lb-earn">π ' + parseFloat(u.piEarned || 0).toFixed(1) + '</div>' +
+        '<div style="font-size:11px;color:var(--text3);margin-top:2px;">Score: ' + (u.trustScore || 0) + '/100</div>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+}
+
+// ── PROFILE ───────────────────────────────────────────────────────────────────
+function addActivity(text, pi, icon) {
+  actLog.unshift({ text: text, pi: pi, icon: icon || '📋', time: new Date().toLocaleTimeString() });
+  if (actLog.length > 30) actLog.pop();
+}
+
+function renderProfile() {
+  var mine   = tasks.filter(function(t) { return t.claimed; });
+  var earned = mine.reduce(function(a, t) { return a + parseFloat(t.bounty || 0); }, 0);
+  var trust  = Math.min(100, (mine.length * 8) + (actLog.length * 2) + ((currentUser && currentUser.trustScore) || 0));
+  setEl('ps-claimed', String(mine.length));
+  setEl('ps-done',    String(mine.filter(function(t) { return t.status === 'completed'; }).length));
+  var myId = currentUser && (currentUser.id || currentUser._id);
+  setEl('ps-posted',  String(tasks.filter(function(t) { return String(t.posterId) === String(myId); }).length));
+  setEl('ps-earn',    parseFloat((currentUser && currentUser.piEarned) || earned).toFixed(1));
+  setEl('p-trust-lbl', trust + ' / 100');
+  var fill = document.getElementById('p-trust-fill');
+  if (fill) fill.style.width = trust + '%';
+  var list = document.getElementById('act-list');
+  if (!list) return;
+  if (!actLog.length) {
+    list.innerHTML = '<div class="empty-state" style="padding:40px 0;">' +
+      '<div class="empty-icon">📋</div>' +
+      '<div class="empty-title">No activity yet</div>' +
+      '<div class="empty-sub">Claim or post a task to see your history here</div>' +
+      '</div>';
+    return;
+  }
+  list.innerHTML = actLog.map(function(a) {
+    return '<div class="act-item">' +
+      '<div class="act-ico">' + (a.icon || '📋') + '</div>' +
+      '<div class="act-info"><div class="act-text">' + a.text + '</div><div class="act-time">' + a.time + '</div></div>' +
+      (a.pi ? '<div class="act-amount">π ' + parseFloat(a.pi).toFixed(1) + '</div>' : '') +
+    '</div>';
+  }).join('');
+}
+
+// ── INIT — entry point ────────────────────────────────────────────────────────
+// Uses async IIFE so errors never block page render
+(async function init() {
+  renderFilterBar();
+
+  // Hide loading screen after 1.2s regardless of network state
+  setTimeout(function() {
+    var ls = document.getElementById('ls');
+    if (ls) {
+      ls.classList.add('hide');
+      setTimeout(function() { ls.style.display = 'none'; }, 400);
+    }
+  }, 1200);
+
+  // Load public stats for landing page (non-blocking)
+  api('GET', '/api/stats').then(function(d) {
+    setEl('hs-live',  d.liveTasks  != null ? String(d.liveTasks)  : '—');
+    setEl('hs-pi',    d.totalPi    != null ? parseFloat(d.totalPi).toFixed(1) : '—');
+    setEl('hs-users', d.totalUsers != null ? String(d.totalUsers) : '—');
+  }).catch(function() {});
+
+  // If already logged in via saved token, go straight to app
+  if (authToken && currentUser) {
+    enterApp();
+    return;
+  }
+
+  // Pi Browser detected — auto-authenticate per Pi SDK docs
+  if (IS_PI_BROWSER) {
+    try {
+      // Step 1: await Pi.init() before calling Pi.authenticate()
+      var inited = await initPiSDK();
+      if (inited) {
+        // Step 2: authenticate with 'username' scope only
+        var auth = await PiSDK.authenticate(['username'], handleIncompletePayment);
+        // Step 3: validate with backend (server calls GET /v2/me)
+        var data = await api('POST', '/api/auth/pi', {
+          piUid:       auth.user.uid,
+          piUsername:  auth.user.username,
+          accessToken: auth.accessToken
+        });
+        authToken   = data.token;
+        currentUser = data.user;
+        localStorage.setItem('arena_token', authToken);
+        localStorage.setItem('arena_user',  JSON.stringify(currentUser));
+        enterApp();
+        return;
+      }
+    } catch (e) {
+      console.warn('[Arena] Auto Pi auth skipped:', e.message);
+      // Fall through to landing page — do NOT block rendering
+    }
+  }
+
+  // Default: show landing page
+  showPage('pg-landing');
+}());
+</script>
+</body>
+</html>
