@@ -115,6 +115,8 @@ button,input,select,textarea{font-family:var(--font);}
 #ls{
   position:fixed;
   inset:0;
+  width:100%;
+  height:100vh;
   background:var(--bg);
   display:flex;
   flex-direction:column;
@@ -122,16 +124,47 @@ button,input,select,textarea{font-family:var(--font);}
   justify-content:center;
   z-index:9000;
   transition:opacity 0.4s ease;
+  box-sizing:border-box;
+  padding:40px 20px;
 }
-#loading-screen.hide{opacity:0;pointer-events:none;}
+
+#ls.hide{
+  opacity:0;
+  pointer-events:none;
+}
+
 .loading-logo{
   display:flex;
   align-items:center;
   justify-content:center;
+  flex-shrink:0;
 }
-.loading-bar{width:120px;height:3px;background:var(--border);border-radius:2px;margin-top:14px;overflow:hidden;}
-.loading-fill{height:100%;border-radius:2px;background:linear-gradient(90deg,var(--border) 25%,var(--gold) 50%,var(--border) 75%);background-size:240px 100%;animation:shimmer 1.4s infinite;}
-.loading-text{font-size:12px;font-weight:700;color:var(--text3);letter-spacing:0.1em;text-transform:uppercase;margin-top:12px;}
+
+.loading-logo img{
+  display:block;
+  width:180px;
+  height:auto;
+  max-width:80vw;
+  object-fit:contain;
+}
+
+.loading-bar{
+  width:120px;
+  height:3px;
+  background:var(--border);
+  border-radius:2px;
+  margin-top:20px;
+  overflow:hidden;
+  flex-shrink:0;
+}
+
+.loading-fill{
+  height:100%;
+  border-radius:2px;
+  background:linear-gradient(90deg,var(--border) 25%,var(--gold) 50%,var(--border) 75%);
+  background-size:240px 100%;
+  animation:shimmer 1.4s infinite;
+}
 /* NOT-PI BANNER */
 #not-pi-banner{display:none;background:var(--amber-bg);border-bottom:1px solid rgba(245,158,11,0.2);padding:9px 20px;text-align:center;font-size:13px;font-weight:500;color:var(--amber-text);}
 [data-theme="dark"] #not-pi-banner{color:var(--amber);}
@@ -379,8 +412,7 @@ button,input,select,textarea{font-family:var(--font);}
   <div class="loading-logo">
     <img src="https://torbem-12.github.io/The-Arena/logo.png"
          alt="The Arena"
-         style="width:180px;height:auto;margin-top:40px;"
-         onerror="this.style.display='none';document.getElementById('ls-fb').style.display='flex'"/>
+         onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"/>
 
     <div id="ls-fb"
          style="display:none;width:110px;height:110px;background:var(--gold-bg);border:2px solid var(--gold-border);border-radius:20px;align-items:center;justify-content:center;font-size:52px;font-weight:900;color:var(--gold);">
@@ -392,7 +424,6 @@ button,input,select,textarea{font-family:var(--font);}
     <div class="loading-fill"></div>
   </div>
 </div>
-
 <!-- NOT PI BANNER -->
 <div id="not-pi-banner">⚠ Pi Browser not detected — Pi Wallet and payments require Pi Browser to function</div>
 
