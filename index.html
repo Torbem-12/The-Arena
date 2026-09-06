@@ -1512,34 +1512,6 @@ function renderProfile() {
     enterApp();
     return;
   }
-
-  // Pi Browser detected — auto-authenticate per Pi SDK docs
-  if (IS_PI_BROWSER) {
-    try {
-      // Step 1: await Pi.init() before calling Pi.authenticate()
-      var inited = await initPiSDK();
-      if (inited) {
-        // Step 2: authenticate with 'username' scope only
-        var auth = await PiSDK.authenticate(['username'], handleIncompletePayment);
-        // Step 3: validate with backend (server calls GET /v2/me)
-        var data = await api('POST', '/api/auth/pi', {
-          piUid:       auth.user.uid,
-          piUsername:  auth.user.username,
-          accessToken: auth.accessToken
-        });
-        authToken   = data.token;
-        currentUser = data.user;
-        localStorage.setItem('arena_token', authToken);
-        localStorage.setItem('arena_user',  JSON.stringify(currentUser));
-        enterApp();
-        return;
-      }
-    } catch (e) {
-      console.warn('[Arena] Auto Pi auth skipped:', e.message);
-      // Fall through to landing page — do NOT block rendering
-    }
-  }
-
   // Default: show landing page
   showPage('pg-landing');
 }());
