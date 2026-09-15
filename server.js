@@ -38,6 +38,7 @@ const UserSchema = new mongoose.Schema({
   tasksCompleted: { type: Number, default: 0 },
   piEarned:       { type: Number, default: 0 },
   trustScore:     { type: Number, default: 0 },
+  isPremium:      { type: Boolean, default: false },
   createdAt:      { type: Date, default: Date.now }
 });
 
@@ -54,6 +55,7 @@ const TaskSchema = new mongoose.Schema({
   deadline:    { type: Date, required: true },
   status:      { type: String, enum: ['open','in_progress','completed','cancelled'], default: 'open' },
   hot:         { type: Boolean, default: false },
+  listingFeePaid: { type: Boolean, default: false },
   txid:        { type: String },
   claimants:   [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
   createdAt:   { type: Date, default: Date.now }
@@ -210,7 +212,8 @@ function safeUser(u) {
     tasksClaimed:   u.tasksClaimed,
     tasksCompleted: u.tasksCompleted,
     piEarned:       u.piEarned,
-    trustScore:     u.trustScore
+    trustScore:     u.trustScore,
+    isPremium:      u.isPremium || false
   };
 }
 
@@ -382,80 +385,154 @@ app.get('/api/stats', async (req, res) => {
 });
 
 // ══════════════════════════════════════════════════════════════════════════════
-// PI PAYMENT ROUTES
+// PI PAYMENT ROUTES (U2A — User to App)
+// Products: escrow, listing_fee, premium, tip
+// PI_NETWORK_API_KEY is read from process.env — never hardcoded
+// Pi Platform API base: https://api.minepi.com
 // ══════════════════════════════════════════════════════════════════════════════
 
+// Shared Pi API helper
+async function piRequest(path, method = 'POST', body = null) {
+  if (!process.env.PI_NETWORK_API_KEY) {
+    throw new Error('PI_NETWORK_API_KEY env var is not set on the server');
+  }
+  const opts = {
+    method,
+    headers: {
+      Authorization: `Key ${process.env.PI_NETWORK_API_KEY}`,
+      'Content-Type': 'application/json'
+    }
+  };
+  if (body) opts.body = JSON.stringify(body);
+  const res = await fetch(`https://api.minepi.com${path}`, opts);
+  const text = await res.text();
+  let data;
+  try { data = JSON.parse(text); } catch { data = { raw: text }; }
+  if (!res.ok) throw new Error(data.error_message || data.message || text || `HTTP ${res.status}`);
+  return data;
+}
+
 // POST /api/payments/approve
+// Called by frontend onReadyForServerApproval
+// Validates product type and approves with Pi Network
 app.post('/api/payments/approve', async (req, res) => {
   try {
     const { paymentId, metadata } = req.body;
     if (!paymentId) return res.status(400).json({ error: 'paymentId required' });
 
-    const piRes = await fetch(`https://api.minepi.com/v2/payments/${paymentId}/approve`, {
-      method:  'POST',
-      headers: { Authorization: `Key ${process.env.PI_API_KEY}` }
-    });
-
-    if (!piRes.ok) {
-      const err = await piRes.text();
-      console.error('[Arena] Pi approve failed:', err);
-      return res.status(502).json({ error: 'Pi approval failed' });
+    const validTypes = ['escrow', 'listing_fee', 'premium', 'tip'];
+    const payType = metadata?.type || 'unknown';
+    if (!validTypes.includes(payType)) {
+      console.warn('[Arena] Unknown payment type:', payType);
     }
 
-    const piData = await piRes.json();
+    console.log(`[Arena] Approving ${payType} payment: ${paymentId}`);
+    const piData = await piRequest(`/v2/payments/${paymentId}/approve`);
+    console.log(`[Arena] Payment approved: ${paymentId}, amount: ${piData.amount}`);
+
     await Payment.findOneAndUpdate(
       { paymentId },
-      { paymentId, status: 'approved', metadata, amount: piData.amount },
-      { upsert: true }
+      {
+        paymentId,
+        status:   'approved',
+        metadata: metadata || {},
+        amount:   piData.amount,
+        userId:   piData.user_uid || null
+      },
+      { upsert: true, new: true }
     );
-    res.json({ success: true, payment: piData });
-  } catch (e) { res.status(500).json({ error: e.message }); }
+
+    res.json({ success: true, paymentId, amount: piData.amount });
+  } catch (e) {
+    console.error('[Arena] /api/payments/approve error:', e.message);
+    res.status(500).json({ error: e.message });
+  }
 });
 
 // POST /api/payments/complete
+// Called by frontend onReadyForServerCompletion
 app.post('/api/payments/complete', async (req, res) => {
   try {
     const { paymentId, txid } = req.body;
-    if (!paymentId || !txid) return res.status(400).json({ error: 'paymentId and txid required' });
+    if (!paymentId) return res.status(400).json({ error: 'paymentId required' });
+    if (!txid)      return res.status(400).json({ error: 'txid required' });
 
-    const piRes = await fetch(`https://api.minepi.com/v2/payments/${paymentId}/complete`, {
-      method:  'POST',
-      headers: {
-        Authorization:  `Key ${process.env.PI_API_KEY}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ txid })
-    });
+    console.log(`[Arena] Completing payment: ${paymentId}, txid: ${txid}`);
+    const piData = await piRequest(`/v2/payments/${paymentId}/complete`, 'POST', { txid });
+    console.log(`[Arena] Payment completed: ${paymentId}`);
 
-    if (!piRes.ok) {
-      const err = await piRes.text();
-      console.error('[Arena] Pi complete failed:', err);
-      return res.status(502).json({ error: 'Pi completion failed' });
+    const payment = await Payment.findOneAndUpdate(
+      { paymentId },
+      { status: 'completed', txid },
+      { upsert: true, new: true }
+    );
+
+    // Post-completion actions per product type
+    const meta = payment?.metadata || piData.metadata || {};
+    if (meta.type === 'premium' && meta.userId) {
+      await User.findByIdAndUpdate(meta.userId, { isPremium: true });
+    }
+    if (meta.type === 'listing_fee' && meta.taskId) {
+      await Task.findByIdAndUpdate(meta.taskId, { listingFeePaid: true });
     }
 
-    const piData = await piRes.json();
-    await Payment.findOneAndUpdate({ paymentId }, { status: 'completed', txid });
-    res.json({ success: true, payment: piData });
-  } catch (e) { res.status(500).json({ error: e.message }); }
+    res.json({ success: true, paymentId, txid });
+  } catch (e) {
+    console.error('[Arena] /api/payments/complete error:', e.message);
+    res.status(500).json({ error: e.message });
+  }
 });
 
 // POST /api/payments/incomplete
+// Called by frontend onIncompletePaymentFound — never silently ignored
 app.post('/api/payments/incomplete', async (req, res) => {
   try {
     const { paymentId } = req.body;
     if (!paymentId) return res.status(400).json({ error: 'paymentId required' });
+
+    console.log(`[Arena] Handling incomplete payment: ${paymentId}`);
     const existing = await Payment.findOne({ paymentId });
-    if (existing && existing.status === 'approved') {
-      // Was approved but never completed — attempt completion would happen via client retry
-      console.log('[Arena] Incomplete payment was approved:', paymentId);
-    } else {
-      // Cancel it
-      await fetch(`https://api.minepi.com/v2/payments/${paymentId}/cancel`, {
-        method:  'POST',
-        headers: { Authorization: `Key ${process.env.PI_API_KEY}` }
-      }).catch(() => {});
+
+    if (existing?.status === 'completed') {
+      return res.json({ success: true, status: 'already_completed' });
     }
-    res.json({ success: true });
+
+    if (existing?.status === 'approved' && existing?.txid) {
+      // Already approved and has txid — complete it
+      try {
+        await piRequest(`/v2/payments/${paymentId}/complete`, 'POST', { txid: existing.txid });
+        await Payment.findOneAndUpdate({ paymentId }, { status: 'completed' });
+        console.log(`[Arena] Incomplete payment completed: ${paymentId}`);
+      } catch (e) {
+        console.warn('[Arena] Could not complete approved payment:', e.message);
+      }
+    } else {
+      // Not yet approved — approve it now
+      try {
+        const piData = await piRequest(`/v2/payments/${paymentId}/approve`);
+        await Payment.findOneAndUpdate(
+          { paymentId },
+          { paymentId, status: 'approved', amount: piData.amount },
+          { upsert: true }
+        );
+        console.log(`[Arena] Incomplete payment approved, awaiting completion: ${paymentId}`);
+      } catch (e) {
+        console.warn('[Arena] Could not approve incomplete payment:', e.message);
+      }
+    }
+
+    res.json({ success: true, paymentId });
+  } catch (e) {
+    console.error('[Arena] /api/payments/incomplete error:', e.message);
+    res.status(500).json({ error: e.message });
+  }
+});
+
+// GET /api/payments/premium/status — check if current user is premium
+app.get('/api/payments/premium/status', requireAuth, async (req, res) => {
+  try {
+    const user = await User.findById(req.userId).select('isPremium');
+    res.json({ isPremium: user?.isPremium || false });
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
